@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Some Linux SDK builds ship without the PrunePackageData folder, which
+         makes restore fail with NETSDK1226. Harmless elsewhere. -->
+    <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
+  </PropertyGroup>
+
+  <!-- Package versions follow the target framework: a 9.x project must not
+       reference 10.x packages. The second group applies by default. -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <AspNetPackageVersion>9.0.20</AspNetPackageVersion>
+    <NpgsqlPackageVersion>9.0.4</NpgsqlPackageVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(AspNetPackageVersion)' == ''">
+    <AspNetPackageVersion>10.0.11</AspNetPackageVersion>
+    <NpgsqlPackageVersion>10.0.3</NpgsqlPackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Identity and its ready-made Razor Pages UI (login, register). -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(AspNetPackageVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="$(AspNetPackageVersion)" />
+
+    <!-- Both database providers ship with the project; one is picked at runtime. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(AspNetPackageVersion)" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(NpgsqlPackageVersion)" />
+    <!-- Pinned above the version EF Core pulls in, which has a known vulnerability. -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
+
+    <!-- Needed by the `dotnet ef` command line tools. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="$(AspNetPackageVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(AspNetPackageVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+  </ItemGroup>
+</Project>
