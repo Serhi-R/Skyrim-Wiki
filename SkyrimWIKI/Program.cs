@@ -42,8 +42,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    services.GetRequiredService<AppDbContext>().Database.Migrate();
+    var db = services.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
     DbSeeder.Seed(services, app.Configuration);
+    DomainSeeder.Seed(db);
 }
 
 if (!app.Environment.IsDevelopment())
