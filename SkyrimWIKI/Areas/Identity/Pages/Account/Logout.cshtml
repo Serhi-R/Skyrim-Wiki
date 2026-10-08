@@ -4,7 +4,16 @@
     ViewData["Title"] = "Log out";
 }
 
-<header>
-    <h1>@ViewData["Title"]</h1>
-    <p>You have successfully logged out of the application.</p>
-</header>
+<div class="mx-auto max-w-md rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+    <h1 class="text-2xl font-bold text-slate-900">
+        <span class="t-en">Logged out</span><span class="t-bg">Изход</span>
+    </h1>
+    <p class="mt-2 text-sm text-slate-500">
+        <span class="t-en">You have successfully logged out of the application.</span>
+        <span class="t-bg">Успешно излязохте от профила си.</span>
+    </p>
+    <a asp-area="" asp-controller="Home" asp-action="Index"
+       class="mt-4 inline-block text-sm font-medium text-emerald-700 hover:underline">
+        <span class="t-en">Back to home</span><span class="t-bg">Към началото</span>
+    </a>
+</div>

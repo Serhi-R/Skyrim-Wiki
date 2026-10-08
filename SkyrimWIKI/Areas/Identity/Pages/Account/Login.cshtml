@@ -4,38 +4,60 @@
     ViewData["Title"] = "Log in";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label"></label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label"></label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div class="mt-3">
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                </div>
-            </form>
-        </section>
+<div class="mx-auto max-w-md">
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 class="mb-1 text-2xl font-bold text-slate-900">
+            <span class="t-en">Log in</span><span class="t-bg">Вход</span>
+        </h1>
+        <p class="mb-5 text-sm text-slate-500">
+            <span class="t-en">Sign in with your email and password.</span>
+            <span class="t-bg">Влезете с имейл и парола.</span>
+        </p>
+
+        <form id="account" method="post" class="space-y-4">
+            <div asp-validation-summary="ModelOnly"
+                 class="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700"
+                 role="alert"></div>
+
+            <div>
+                <label asp-for="Input.Email" class="mb-1 block text-sm font-medium text-slate-700">
+                    <span class="t-en">Email</span><span class="t-bg">Имейл</span>
+                </label>
+                <input asp-for="Input.Email" autocomplete="username" aria-required="true"
+                       placeholder="name@example.com"
+                       class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+                <span asp-validation-for="Input.Email" class="mt-1 block text-sm text-rose-600"></span>
+            </div>
+
+            <div>
+                <label asp-for="Input.Password" class="mb-1 block text-sm font-medium text-slate-700">
+                    <span class="t-en">Password</span><span class="t-bg">Парола</span>
+                </label>
+                <input asp-for="Input.Password" type="password" autocomplete="current-password"
+                       aria-required="true" placeholder="password"
+                       class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+                <span asp-validation-for="Input.Password" class="mt-1 block text-sm text-rose-600"></span>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input asp-for="Input.RememberMe" class="h-4 w-4 rounded border-slate-300 text-emerald-600" />
+                <label asp-for="Input.RememberMe" class="text-sm text-slate-600">
+                    <span class="t-en">Remember me</span><span class="t-bg">Запомни ме</span>
+                </label>
+            </div>
+
+            <button id="login-submit" type="submit"
+                    class="w-full rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+                <span class="t-en">Log in</span><span class="t-bg">Вход</span>
+            </button>
+
+            <p class="text-sm text-slate-500">
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="text-emerald-700 hover:underline">
+                    <span class="t-en">Register as a new user</span>
+                    <span class="t-bg">Регистрирайте нов профил</span>
+                </a>
+            </p>
+        </form>
     </div>
 </div>
 
