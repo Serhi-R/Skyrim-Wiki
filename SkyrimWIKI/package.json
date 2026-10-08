@@ -1,0 +1,21 @@
+{
+  "name": "skyrimwiki",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "tailwindcss -i ClientApp/styles/site.css -o wwwroot/css/site.css --minify",
+    "build:js": "esbuild ClientApp/main.tsx --bundle --minify --outfile=wwwroot/js/app.js --jsx=automatic --define:process.env.NODE_ENV='\"production\"'",
+    "watch:css": "tailwindcss -i ClientApp/styles/site.css -o wwwroot/css/site.css --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.1",
+    "esbuild": "^0.25.9",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.3"
+  }
+}

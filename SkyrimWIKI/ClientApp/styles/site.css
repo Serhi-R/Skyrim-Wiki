@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@source "../../Views";
+@source "../../Areas";
+@source "..";
+
+/* Bilingual UI: every translated string has a t-en and a t-bg span, and only
+   the one matching the current language is displayed. */
+[data-lang="en"] .t-bg {
+  display: none;
+}
+
+[data-lang="bg"] .t-en {
+  display: none;
+}

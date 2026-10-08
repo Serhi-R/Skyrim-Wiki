@@ -1,0 +1,1 @@
+"use strict";(()=>{var a="skyrimwiki.lang",n=document.documentElement;function o(e){n.dataset.lang=e,n.lang=e}var t=localStorage.getItem(a);(t==="en"||t==="bg")&&o(t);document.getElementById("lang-toggle")?.addEventListener("click",()=>{let e=n.dataset.lang==="en"?"bg":"en";o(e),localStorage.setItem(a,e)});})();

@@ -1,27 +1,36 @@
 @using Microsoft.AspNetCore.Identity
 @using SkyrimWIKI.Models
 @inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
+<ul class="flex items-center gap-3 text-sm">
 @if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+    {
+        <li class="font-medium text-slate-700">
+            @User.Identity?.Name
+        </li>
+        <li>
+            <form asp-area="Identity" asp-page="/Account/Logout"
+                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit"
+                        class="rounded-md bg-slate-100 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-200">
+                    <span class="t-en">Log out</span><span class="t-bg">Изход</span>
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li>
+            <a asp-area="Identity" asp-page="/Account/Register"
+               class="font-medium text-slate-600 hover:text-emerald-700">
+                <span class="t-en">Register</span><span class="t-bg">Регистрация</span>
+            </a>
+        </li>
+        <li>
+            <a asp-area="Identity" asp-page="/Account/Login"
+               class="rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white hover:bg-emerald-700">
+                <span class="t-en">Log in</span><span class="t-bg">Вход</span>
+            </a>
+        </li>
+    }
 </ul>
