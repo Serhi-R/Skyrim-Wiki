@@ -13,12 +13,12 @@ namespace SkyrimWIKI.Controllers;
 // from the form.
 public class QuestsController : Controller
 {
-    private readonly IRepository<Quest> _quests;
+    private readonly IQuestRepository _quests;
     private readonly IRepository<Location> _locations;
     private readonly ImageStorage _images;
 
     public QuestsController(
-        IRepository<Quest> quests,
+        IQuestRepository quests,
         IRepository<Location> locations,
         ImageStorage images)
     {
@@ -27,16 +27,29 @@ public class QuestsController : Controller
         _images = images;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(QuestFilter filter)
     {
-        var locations = _locations.GetAll().ToDictionary(l => l.Id);
-        var cards = _quests.GetAll()
-            .OrderBy(q => q.Title)
-            .Select(q => QuestCardViewModel.From(
-                q, locations.TryGetValue(q.LocationId, out var l) ? l.Name : ""))
-            .ToList();
+        var result = _quests.Search(filter);
 
-        return View(cards);
+        var model = new QuestIndexViewModel
+        {
+            Filter = new QuestFilter
+            {
+                Term = filter.Term,
+                LocationId = filter.LocationId,
+                MinLevel = filter.MinLevel,
+                MaxLevel = filter.MaxLevel,
+                Sort = filter.Sort,
+                Page = result.Page,
+                PageSize = result.PageSize
+            },
+            Locations = _locations.GetAll().OrderBy(l => l.Name).ToList(),
+            Quests = result.Items.Select(QuestCardViewModel.From).ToList(),
+            TotalCount = result.TotalCount,
+            TotalPages = result.TotalPages
+        };
+
+        return View(model);
     }
 
     public IActionResult Details(int id)

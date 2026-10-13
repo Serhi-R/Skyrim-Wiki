@@ -11,6 +11,10 @@ public class QuestCardViewModel
     public string LocationName { get; set; } = string.Empty;
     public string Excerpt { get; set; } = string.Empty;
 
+    // Used when the location was already loaded (Include) with the quest.
+    public static QuestCardViewModel From(Quest quest)
+        => From(quest, quest.Location?.Name ?? string.Empty);
+
     public static QuestCardViewModel From(Quest quest, string locationName)
     {
         var excerpt = quest.Description.Length > 140

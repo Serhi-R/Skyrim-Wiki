@@ -33,6 +33,10 @@ builder.Services
 // Repository<Product>. No line is needed per entity.
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
+// Entities with extra queries get their own registration: a request for
+// IQuestRepository must resolve to QuestRepository, not to Repository<Quest>.
+builder.Services.AddScoped<IQuestRepository, QuestRepository>();
+
 // --- File uploads ---------------------------------------------------------
 builder.Services.AddScoped<ImageStorage>();
 
