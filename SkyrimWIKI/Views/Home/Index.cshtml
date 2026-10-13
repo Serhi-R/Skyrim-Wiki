@@ -1,37 +1,39 @@
+@model SkyrimWIKI.Models.ViewModels.HomeViewModel
 @{
     ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">SkyrimWIKI</h1>
-    <p class="lead">
-        ASP.NET Core MVC + Identity + EF Core + the repository pattern.<br />
-        ASP.NET Core MVC + Identity + EF Core + шаблонът "хранилище".
+<section class="rounded-2xl bg-gradient-to-r from-emerald-700 to-slate-900 px-6 py-12 text-white sm:px-10 sm:py-16">
+    <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">SkyrimWIKI</h1>
+    <p class="mt-3 max-w-2xl text-emerald-50">
+        <span class="t-en">A community wiki for the quests, races and locations of Skyrim.</span>
+        <span class="t-bg">Общо уики за задания, раси и локации от Skyrim.</span>
     </p>
-</div>
+</section>
 
-<div class="row mt-5">
-    <div class="col-md-6">
-        <h4>What is already wired up</h4>
-        <ul>
-            <li>User accounts: register, log in, log out</li>
-            <li>An <code>Admin</code> role and a seeded administrator</li>
-            <li>EF Core over SQLite <em>or</em> PostgreSQL, chosen in <code>appsettings.json</code></li>
-            <li><code>IRepository&lt;T&gt;</code> registered for every entity</li>
-        </ul>
+<section class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm">
+        <p class="text-3xl font-bold text-emerald-700">@Model.QuestCount</p>
+        <p class="mt-1 text-sm text-slate-500"><span class="t-en">Quests</span><span class="t-bg">Задания</span></p>
     </div>
-    <div class="col-md-6">
-        <h4>Какво вече е настроено</h4>
-        <ul>
-            <li>Потребителски акаунти: регистрация, вход, изход</li>
-            <li>Роля <code>Admin</code> и създаден администратор</li>
-            <li>EF Core върху SQLite <em>или</em> PostgreSQL, избрано в <code>appsettings.json</code></li>
-            <li><code>IRepository&lt;T&gt;</code>, регистриран за всяка същност</li>
-        </ul>
+    <div class="rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm">
+        <p class="text-3xl font-bold text-emerald-700">@Model.LocationCount</p>
+        <p class="mt-1 text-sm text-slate-500"><span class="t-en">Locations</span><span class="t-bg">Локации</span></p>
     </div>
-</div>
+    <div class="rounded-xl border border-slate-200 bg-white p-5 text-center shadow-sm">
+        <p class="text-3xl font-bold text-emerald-700">@Model.RaceCount</p>
+        <p class="mt-1 text-sm text-slate-500"><span class="t-en">Races</span><span class="t-bg">Раси</span></p>
+    </div>
+</section>
 
-<div class="alert alert-info mt-4">
-    Next step: read <code>README.md</code> to add your first entity, repository and CRUD controller.<br />
-    Следваща стъпка: прочетете <code>README.md</code>, за да добавите първата си същност, хранилище и CRUD контролер.
-</div>
+<section class="mt-10">
+    <h2 class="text-xl font-bold text-slate-900">
+        <span class="t-en">Latest quests</span><span class="t-bg">Последни задания</span>
+    </h2>
+    <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        @foreach (var quest in Model.LatestQuests)
+        {
+            <partial name="_QuestCard" model="quest" />
+        }
+    </div>
+</section>

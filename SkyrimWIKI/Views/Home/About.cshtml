@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "About";
+}
+
+<h1 class="text-2xl font-bold text-slate-900">
+    <span class="t-en">About the project</span><span class="t-bg">За проекта</span>
+</h1>
+
+<section class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 class="font-semibold text-slate-900">
+            <span class="t-en">Team</span><span class="t-bg">Екип</span>
+        </h2>
+        <p class="mt-2 text-sm text-slate-600">Serhi-R</p>
+        <p class="mt-1 text-sm text-slate-500">
+            <span class="t-en">Individual project, one author.</span>
+            <span class="t-bg">Индивидуален проект, един автор.</span>
+        </p>
+    </div>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 class="font-semibold text-slate-900">
+            <span class="t-en">Main features</span><span class="t-bg">Основни функции</span>
+        </h2>
+        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+            <li><span class="t-en">Wiki pages for quests, races and locations</span><span class="t-bg">Страници за задания, раси и локации</span></li>
+            <li><span class="t-en">Full CRUD for quest entries</span><span class="t-bg">Пълен CRUD за записите със задания</span></li>
+            <li><span class="t-en">Registration, login and protected actions</span><span class="t-bg">Регистрация, вход и защитени действия</span></li>
+            <li><span class="t-en">Bilingual interface, English and Bulgarian</span><span class="t-bg">Двуезичен интерфейс, английски и български</span></li>
+        </ul>
+    </div>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 class="font-semibold text-slate-900">
+            <span class="t-en">Technologies</span><span class="t-bg">Технологии</span>
+        </h2>
+        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+            <li>ASP.NET Core MVC, .NET 10</li>
+            <li>Entity Framework Core, SQLite</li>
+            <li>ASP.NET Core Identity</li>
+            <li>Razor views, Tailwind CSS</li>
+        </ul>
+    </div>
+</section>
+
+<section class="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="font-semibold text-slate-900">
+        <span class="t-en">Architecture</span><span class="t-bg">Архитектура</span>
+    </h2>
+    <p class="mt-2 text-sm leading-relaxed text-slate-600">
+        <span class="t-en">
+            The application follows MVC: models hold the data and its validation
+            rules, controllers decide what to show, and Razor views render the
+            HTML. Controllers reach the database only through the repository
+            pattern, never directly.
+        </span>
+        <span class="t-bg">
+            Приложението следва MVC: моделите пазят данните и правилата за
+            валидация, контролерите решават какво да се покаже, а Razor
+            изгледите рендерират HTML. Контролерите достигат до базата данни
+            само чрез шаблона repository, никога директно.
+        </span>
+    </p>
+</section>
