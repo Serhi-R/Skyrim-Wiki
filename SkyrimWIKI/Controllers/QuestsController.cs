@@ -15,45 +15,21 @@ public class QuestsController : Controller
 {
     private readonly IQuestRepository _quests;
     private readonly IRepository<Location> _locations;
-    private readonly IRepository<Comment> _comments;
     private readonly ImageStorage _images;
 
     public QuestsController(
         IQuestRepository quests,
         IRepository<Location> locations,
-        IRepository<Comment> comments,
         ImageStorage images)
     {
         _quests = quests;
         _locations = locations;
-        _comments = comments;
         _images = images;
     }
 
-    public IActionResult Index(QuestFilter filter)
-    {
-        var result = _quests.Search(filter);
-
-        var model = new QuestIndexViewModel
-        {
-            Filter = new QuestFilter
-            {
-                Term = filter.Term,
-                LocationId = filter.LocationId,
-                MinLevel = filter.MinLevel,
-                MaxLevel = filter.MaxLevel,
-                Sort = filter.Sort,
-                Page = result.Page,
-                PageSize = result.PageSize
-            },
-            Locations = _locations.GetAll().OrderBy(l => l.Name).ToList(),
-            Quests = result.Items.Select(QuestCardViewModel.From).ToList(),
-            TotalCount = result.TotalCount,
-            TotalPages = result.TotalPages
-        };
-
-        return View(model);
-    }
+    // The list itself is rendered by the React catalog from /api/quests; this
+    // action only serves the page shell.
+    public IActionResult Index() => View();
 
     public IActionResult Details(int id)
     {
@@ -65,17 +41,11 @@ public class QuestsController : Controller
 
         var location = _locations.GetById(quest.LocationId);
 
-        var comments = _comments.Find(c => c.QuestId == id)
-            .OrderByDescending(c => c.CreatedAt)
-            .ToList();
-
         var model = new QuestDetailsViewModel
         {
             Quest = quest,
             LocationName = location?.Name ?? "",
-            LocationRegion = location?.Region ?? "",
-            Comments = comments,
-            AverageRating = comments.Count == 0 ? 0 : comments.Average(c => c.Rating)
+            LocationRegion = location?.Region ?? ""
         };
 
         return View(model);
