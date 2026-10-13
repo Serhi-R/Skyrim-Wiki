@@ -17,6 +17,8 @@ remembered in the browser.
 - Comments with 1 to 5 star ratings, stored and read through a JSON API
 - CSV export of the quest list, respecting the active filters
 - Bilingual interface, English and Bulgarian
+- Responsive layout for phone, tablet and desktop, with a collapsible
+  navigation menu on small screens
 - Structured logging: console everywhere, rolling files only in development
 
 ## Requirement coverage

@@ -161,7 +161,7 @@ export function CommentSection({
           {data.items.map((comment) => (
             <li key={comment.id} className="rounded-lg bg-slate-50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-slate-800">{comment.author}</p>
+                <p className="break-words text-sm font-semibold text-slate-800">{comment.author}</p>
                 <div className="flex items-center gap-3">
                   <Stars rating={comment.rating} />
                   {comment.canDelete && (
@@ -179,7 +179,7 @@ export function CommentSection({
               <p className="mt-1 text-xs text-slate-400">
                 {new Date(comment.createdAt).toLocaleString()}
               </p>
-              <p className="mt-2 whitespace-pre-line text-sm text-slate-700">{comment.text}</p>
+              <p className="mt-2 whitespace-pre-line break-words text-sm text-slate-700">{comment.text}</p>
             </li>
           ))}
         </ul>

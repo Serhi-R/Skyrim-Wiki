@@ -14,55 +14,66 @@
 }
 <body class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-800">
     <header class="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <nav class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+        <nav class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
             <a asp-controller="Home" asp-action="Index"
                class="text-lg font-bold tracking-tight text-slate-900 hover:text-emerald-700">SkyrimWIKI</a>
 
-            <ul class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-                <li>
-                    <a asp-controller="Home" asp-action="Index" class="@NavLink("Home")">
-                        <span class="t-en">Home</span><span class="t-bg">Начало</span>
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Quests" asp-action="Index" class="@NavLink("Quests")">
-                        <span class="t-en">Quests</span><span class="t-bg">Задания</span>
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Races" asp-action="Index" class="@NavLink("Races")">
-                        <span class="t-en">Races</span><span class="t-bg">Раси</span>
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Locations" asp-action="Index" class="@NavLink("Locations")">
-                        <span class="t-en">Locations</span><span class="t-bg">Локации</span>
-                    </a>
-                </li>
-                <li>
-                    <a asp-controller="Home" asp-action="About" class="@NavLink("Home")">
-                        <span class="t-en">About</span><span class="t-bg">За проекта</span>
-                    </a>
-                </li>
-            </ul>
+            <button id="nav-toggle" type="button"
+                    class="ml-auto rounded-md border border-slate-300 p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
+                    aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-menu">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
 
-            <div class="ml-auto flex items-center gap-3">
-                <button id="lang-toggle" type="button"
-                        class="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                        aria-label="Switch language">
-                    <span class="t-en">БГ</span><span class="t-bg">EN</span>
-                </button>
-                <partial name="_LoginPartial" />
+            <div id="nav-menu"
+                 class="hidden w-full flex-col gap-2 border-t border-slate-100 pt-2 lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:gap-6 lg:border-t-0 lg:pt-0">
+                <ul class="flex flex-col gap-1 text-sm lg:flex-row lg:items-center lg:gap-5">
+                    <li>
+                        <a asp-controller="Home" asp-action="Index" class="@NavLink("Home") block py-1.5 lg:py-0">
+                            <span class="t-en">Home</span><span class="t-bg">Начало</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Quests" asp-action="Index" class="@NavLink("Quests") block py-1.5 lg:py-0">
+                            <span class="t-en">Quests</span><span class="t-bg">Задания</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Races" asp-action="Index" class="@NavLink("Races") block py-1.5 lg:py-0">
+                            <span class="t-en">Races</span><span class="t-bg">Раси</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Locations" asp-action="Index" class="@NavLink("Locations") block py-1.5 lg:py-0">
+                            <span class="t-en">Locations</span><span class="t-bg">Локации</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="About" class="@NavLink("Home") block py-1.5 lg:py-0">
+                            <span class="t-en">About</span><span class="t-bg">За проекта</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="flex items-center gap-3 lg:ml-auto">
+                    <button id="lang-toggle" type="button"
+                            class="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+                            aria-label="Switch language">
+                        <span class="t-en">БГ</span><span class="t-bg">EN</span>
+                    </button>
+                    <partial name="_LoginPartial" />
+                </div>
             </div>
         </nav>
     </header>
 
-    <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+    <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
         @RenderBody()
     </main>
 
     <footer class="border-t border-slate-200 bg-white">
-        <div class="mx-auto max-w-6xl px-4 py-4 text-sm text-slate-500">
+        <div class="mx-auto max-w-6xl px-4 py-4 text-sm text-slate-500 sm:px-6">
             &copy; 2026 SkyrimWIKI &middot;
             <span class="t-en">Microsoft Web Technologies course project</span>
             <span class="t-bg">Курсов проект по Microsoft Web технологии</span>

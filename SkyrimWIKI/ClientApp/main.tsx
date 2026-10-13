@@ -21,6 +21,22 @@ document.getElementById("lang-toggle")?.addEventListener("click", () => {
   localStorage.setItem(STORAGE_KEY, next);
 });
 
+// Mobile navigation: below the lg breakpoint the links are hidden behind a
+// button, and opening adds both display classes the layout expects.
+const navToggle = document.getElementById("nav-toggle");
+const navMenu = document.getElementById("nav-menu");
+
+navToggle?.addEventListener("click", () => {
+  if (!navMenu) {
+    return;
+  }
+
+  const opening = navMenu.classList.contains("hidden");
+  navMenu.classList.toggle("hidden", !opening);
+  navMenu.classList.toggle("flex", opening);
+  navToggle.setAttribute("aria-expanded", String(opening));
+});
+
 // React islands: each one mounts only if its placeholder is on the page.
 const catalog = document.getElementById("quest-catalog");
 if (catalog) {

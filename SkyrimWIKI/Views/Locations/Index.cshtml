@@ -17,7 +17,7 @@
         <a asp-action="Details" asp-route-id="@card.Location.Id"
            class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md">
             <div class="flex items-center justify-between gap-2">
-                <h2 class="font-semibold text-slate-900">@card.Location.Name</h2>
+                <h2 class="break-words font-semibold text-slate-900">@card.Location.Name</h2>
                 <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
                     @card.QuestCount <span class="t-en">quests</span><span class="t-bg">задания</span>
                 </span>

@@ -142,7 +142,7 @@ export function QuestCatalog() {
               value={query.minLevel}
               onChange={(event) => update({ minLevel: event.target.value })}
               placeholder="1"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
             <span className="text-slate-400">-</span>
             <input
@@ -152,7 +152,7 @@ export function QuestCatalog() {
               value={query.maxLevel}
               onChange={(event) => update({ maxLevel: event.target.value })}
               placeholder="81"
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="w-full min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             />
           </div>
         </div>
@@ -225,7 +225,7 @@ export function QuestCatalog() {
               className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-semibold text-slate-900">
+                <h3 className="break-words font-semibold text-slate-900">
                   <a href={`/Quests/Details/${quest.id}`} className="hover:text-emerald-700">
                     {quest.title}
                   </a>
@@ -244,7 +244,7 @@ export function QuestCatalog() {
       )}
 
       {result && result.totalPages > 1 && (
-        <nav className="mt-6 flex items-center justify-center gap-2">
+        <nav className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <button
             type="button"
             disabled={query.page <= 1}
