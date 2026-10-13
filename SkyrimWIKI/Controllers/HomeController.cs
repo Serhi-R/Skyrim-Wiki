@@ -48,6 +48,14 @@ public class HomeController : Controller
 
     public IActionResult About() => View();
 
+    // Re executed for 404 and other error statuses. The status code is set
+    // again because re executing resets it to 200.
+    public IActionResult StatusCode(int code)
+    {
+        Response.StatusCode = code;
+        return View(code);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

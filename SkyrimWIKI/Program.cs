@@ -56,12 +56,20 @@ using (var scope = app.Services.CreateScope())
     DomainSeeder.Seed(db);
 }
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     // Production shows a friendly error page instead of a stack trace.
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+// 404s and other error statuses are re executed through the controller, so
+// the user sees a real page inside the layout instead of an empty body.
+app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
 
 app.UseHttpsRedirection();
 
