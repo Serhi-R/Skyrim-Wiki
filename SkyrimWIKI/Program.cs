@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using SkyrimWIKI.Data;
 using SkyrimWIKI.Models;
 using SkyrimWIKI.Repositories;
@@ -7,6 +8,28 @@ using SkyrimWIKI.Services;
 
 // Entry point: first services are registered, then the HTTP pipeline is built.
 var builder = WebApplication.CreateBuilder(args);
+
+// --- Logging --------------------------------------------------------------
+// Serilog writes to the console everywhere. A rolling log file is added only
+// in development, so a deployed instance does not fill the disk and the
+// development log is easy to find in logs/dev-<date>.log.
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .WriteTo.Console();
+
+    if (context.HostingEnvironment.IsDevelopment())
+    {
+        var logDirectory = Path.Combine(context.HostingEnvironment.ContentRootPath, "logs");
+        configuration.WriteTo.File(
+            Path.Combine(logDirectory, "dev-.log"),
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 7);
+    }
+});
 
 // --- Database -------------------------------------------------------------
 // SQLite by default; the provider is chosen in appsettings.json.
@@ -76,6 +99,9 @@ else
 app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
 
 app.UseHttpsRedirection();
+
+// One log entry per request: method, path, status code and duration.
+app.UseSerilogRequestLogging();
 
 // MapStaticAssets only serves files known at build time, so the classic
 // middleware is kept for uploaded images.

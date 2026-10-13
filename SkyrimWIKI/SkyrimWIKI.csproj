@@ -29,6 +29,7 @@
     <!-- Both database providers ship with the project; one is picked at runtime. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(AspNetPackageVersion)" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(NpgsqlPackageVersion)" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <!-- Pinned above the version EF Core pulls in, which has a known vulnerability. -->
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
 

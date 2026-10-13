@@ -18,15 +18,18 @@ public class CommentsController : ControllerBase
     private readonly IRepository<Comment> _comments;
     private readonly IRepository<Quest> _quests;
     private readonly UserManager<ApplicationUser> _users;
+    private readonly ILogger<CommentsController> _logger;
 
     public CommentsController(
         IRepository<Comment> comments,
         IRepository<Quest> quests,
-        UserManager<ApplicationUser> users)
+        UserManager<ApplicationUser> users,
+        ILogger<CommentsController> logger)
     {
         _comments = comments;
         _quests = quests;
         _users = users;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -85,6 +88,10 @@ public class CommentsController : ControllerBase
         _comments.Add(comment);
         _comments.SaveChanges();
 
+        _logger.LogInformation(
+            "Comment {CommentId} added to quest {QuestId} by {User}",
+            comment.Id, comment.QuestId, user.UserName);
+
         return CreatedAtAction(
             nameof(GetByQuest),
             new { questId = comment.QuestId },
@@ -110,6 +117,10 @@ public class CommentsController : ControllerBase
 
         _comments.Remove(comment);
         _comments.SaveChanges();
+
+        _logger.LogInformation(
+            "Comment {CommentId} deleted by {User}",
+            comment.Id, User.Identity?.Name);
 
         return NoContent();
     }

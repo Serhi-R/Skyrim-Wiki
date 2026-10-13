@@ -17,15 +17,17 @@ public class QuestsController : Controller
     private readonly IQuestRepository _quests;
     private readonly IRepository<Location> _locations;
     private readonly ImageStorage _images;
-
+    private readonly ILogger<QuestsController> _logger;
     public QuestsController(
         IQuestRepository quests,
         IRepository<Location> locations,
-        ImageStorage images)
+        ImageStorage images,
+        ILogger<QuestsController> logger)
     {
         _quests = quests;
         _locations = locations;
         _images = images;
+        _logger = logger;
     }
 
     // The list itself is rendered by the React catalog from /api/quests; this
@@ -42,7 +44,9 @@ public class QuestsController : Controller
         var csv = new StringBuilder();
         csv.AppendLine("Title,Level,Reward,Location,CreatedAt,Description");
 
-        foreach (var quest in _quests.Search(filter).Items)
+        var quests = _quests.Search(filter).Items;
+
+        foreach (var quest in quests)
         {
             csv.Append(Escape(quest.Title)).Append(',')
                 .Append(quest.Level).Append(',')
@@ -58,6 +62,10 @@ public class QuestsController : Controller
         var bytes = Encoding.UTF8.GetPreamble()
             .Concat(Encoding.UTF8.GetBytes(csv.ToString()))
             .ToArray();
+
+        _logger.LogInformation(
+            "Quest export of {Count} rows requested by {User}",
+            quests.Count, User.Identity?.Name);
 
         return File(bytes, "text/csv", $"quests-{DateTime.UtcNow:yyyyMMdd}.csv");
     }
@@ -75,9 +83,7 @@ public class QuestsController : Controller
             return NotFound();
         }
 
-        var location = _locations.GetById(quest.LocationId);
-
-        var model = new QuestDetailsViewModel
+        var location = _locations.GetById(quest.LocationId);        var model = new QuestDetailsViewModel
         {
             Quest = quest,
             LocationName = location?.Name ?? "",
@@ -114,6 +120,10 @@ public class QuestsController : Controller
 
         _quests.Add(quest);
         _quests.SaveChanges();
+
+        _logger.LogInformation(
+            "Quest {QuestId} '{Title}' created by {User}",
+            quest.Id, quest.Title, User.Identity?.Name);
 
         return RedirectToAction(nameof(Details), new { id = quest.Id });
     }
@@ -173,6 +183,10 @@ public class QuestsController : Controller
         _quests.Update(existing);
         _quests.SaveChanges();
 
+        _logger.LogInformation(
+            "Quest {QuestId} '{Title}' edited by {User}",
+            existing.Id, existing.Title, User.Identity?.Name);
+
         return RedirectToAction(nameof(Details), new { id });
     }
 
@@ -192,12 +206,17 @@ public class QuestsController : Controller
         var quest = _quests.GetById(id);
         if (quest is null)
         {
+            _logger.LogWarning("Quest {QuestId} not found", id);
             return NotFound();
         }
 
         _images.Delete(quest.ImagePath);
         _quests.Remove(quest);
         _quests.SaveChanges();
+
+        _logger.LogWarning(
+            "Quest {QuestId} '{Title}' deleted by {User}",
+            quest.Id, quest.Title, User.Identity?.Name);
 
         return RedirectToAction(nameof(Index));
     }

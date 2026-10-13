@@ -13,15 +13,18 @@ public class HomeController : Controller
     private readonly IRepository<Quest> _quests;
     private readonly IRepository<Location> _locations;
     private readonly IRepository<Race> _races;
+    private readonly ILogger<HomeController> _logger;
 
     public HomeController(
         IRepository<Quest> quests,
         IRepository<Location> locations,
-        IRepository<Race> races)
+        IRepository<Race> races,
+        ILogger<HomeController> logger)
     {
         _quests = quests;
         _locations = locations;
         _races = races;
+        _logger = logger;
     }
 
     public IActionResult Index()
@@ -59,6 +62,9 @@ public class HomeController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+        _logger.LogError("Unhandled error, request id {RequestId}", requestId);
+
+        return View(new ErrorViewModel { RequestId = requestId });
     }
 }

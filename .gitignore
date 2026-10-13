@@ -5,6 +5,9 @@ obj/
 [Rr]elease/
 artifacts/
 
+# Serilog files (development only)
+logs/
+
 # Databases - never commit these
 *.db
 *.db-shm
