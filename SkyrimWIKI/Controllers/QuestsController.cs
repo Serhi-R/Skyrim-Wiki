@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -30,6 +31,41 @@ public class QuestsController : Controller
     // The list itself is rendered by the React catalog from /api/quests; this
     // action only serves the page shell.
     public IActionResult Index() => View();
+
+    // Downloads the quests that match the current filter as a CSV file.
+    public IActionResult Export(QuestFilter filter)
+    {
+        // The whole result is wanted, not one page of it.
+        filter.Page = 1;
+        filter.PageSize = int.MaxValue;
+
+        var csv = new StringBuilder();
+        csv.AppendLine("Title,Level,Reward,Location,CreatedAt,Description");
+
+        foreach (var quest in _quests.Search(filter).Items)
+        {
+            csv.Append(Escape(quest.Title)).Append(',')
+                .Append(quest.Level).Append(',')
+                .Append(Escape(quest.Reward)).Append(',')
+                .Append(Escape(quest.Location?.Name ?? "")).Append(',')
+                .Append(quest.CreatedAt.ToString("yyyy-MM-dd")).Append(',')
+                .Append(Escape(quest.Description))
+                .AppendLine();
+        }
+
+        // The UTF-8 byte order mark makes Excel read the file as UTF-8, so
+        // Bulgarian text in the descriptions is not garbled.
+        var bytes = Encoding.UTF8.GetPreamble()
+            .Concat(Encoding.UTF8.GetBytes(csv.ToString()))
+            .ToArray();
+
+        return File(bytes, "text/csv", $"quests-{DateTime.UtcNow:yyyyMMdd}.csv");
+    }
+
+    // Wraps a value in quotes and doubles the quotes inside it, so commas,
+    // quotes and line breaks cannot break the columns.
+    private static string Escape(string value)
+        => $"\"{value.Replace("\"", "\"\"")}\"";
 
     public IActionResult Details(int id)
     {

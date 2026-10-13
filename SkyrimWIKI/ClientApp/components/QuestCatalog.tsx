@@ -189,12 +189,22 @@ export function QuestCatalog() {
         </div>
       </div>
 
-      <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
-        {result ? result.totalCount : 0}
-        <span className="t-en">quests found</span>
-        <span className="t-bg">намерени задания</span>
-        {loading && <span className="text-xs text-slate-400">...</span>}
-      </p>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="flex items-center gap-2 text-sm text-slate-500">
+          {result ? result.totalCount : 0}
+          <span className="t-en">quests found</span>
+          <span className="t-bg">намерени задания</span>
+          {loading && <span className="text-xs text-slate-400">...</span>}
+        </p>
+
+        <a
+          href={`/Quests/Export?${toSearchParams(query)}`}
+          className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+        >
+          <span className="t-en">Export CSV</span>
+          <span className="t-bg">Експорт CSV</span>
+        </a>
+      </div>
 
       {error && (
         <p className="mt-3 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>
