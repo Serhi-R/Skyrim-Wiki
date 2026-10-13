@@ -60,4 +60,53 @@
             </div>
         }
     </div>
+
+    <section class="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 class="text-lg font-bold text-slate-900">
+                <span class="t-en">Comments</span><span class="t-bg">Коментари</span>
+            </h2>
+            <div class="flex items-center gap-2">
+                <partial name="_Stars" model="Model.AverageRating" />
+                <span class="text-sm text-slate-500">
+                    @Model.AverageRating.ToString("0.0") / 5 (@Model.Comments.Count)
+                </span>
+            </div>
+        </div>
+
+        @if (Model.Comments.Count == 0)
+        {
+            <p class="mt-4 rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+                <span class="t-en">No comments yet. Be the first.</span>
+                <span class="t-bg">Още няма коментари. Бъди първи.</span>
+            </p>
+        }
+        else
+        {
+            <ul class="mt-4 space-y-4">
+                @foreach (var comment in Model.Comments)
+                {
+                    <li class="rounded-lg bg-slate-50 p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <p class="text-sm font-semibold text-slate-800">@comment.AuthorName</p>
+                            <partial name="_Stars" model="(double)comment.Rating" />
+                        </div>
+                        <p class="mt-1 text-xs text-slate-400">@comment.CreatedAt.ToString("dd MMM yyyy HH:mm")</p>
+                        <p class="mt-2 whitespace-pre-line text-sm text-slate-700">@comment.Text</p>
+                    </li>
+                }
+            </ul>
+        }
+
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <p class="mt-4 text-sm text-slate-500">
+                <a asp-area="Identity" asp-page="/Account/Login" class="font-medium text-emerald-700 hover:underline">
+                    <span class="t-en">Sign in</span><span class="t-bg">Влез</span>
+                </a>
+                <span class="t-en">to leave a rating and a comment.</span>
+                <span class="t-bg">за да оставиш оценка и коментар.</span>
+            </p>
+        }
+    </section>
 </article>

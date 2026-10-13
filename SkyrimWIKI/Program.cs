@@ -44,6 +44,10 @@ builder.Services.AddScoped<ImageStorage>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
+// The comment widget sends the antiforgery token in this header, because its
+// POST goes out as JSON and not as a form.
+builder.Services.AddAntiforgery(options => options.HeaderName = "RequestVerificationToken");
+
 var app = builder.Build();
 
 // Apply pending migrations and seed the database before the first request.
@@ -91,6 +95,9 @@ app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+// Attribute routed controllers: /api/comments.
+app.MapControllers();
 
 // Identity screens: /Identity/Account/Login, Register, Logout.
 app.MapRazorPages()

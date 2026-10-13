@@ -32,5 +32,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<Location>()
             .HasIndex(l => l.Name)
             .IsUnique();
+
+        // Comments are always read and counted per quest.
+        builder.Entity<Comment>()
+            .HasIndex(c => c.QuestId);
     }
 }

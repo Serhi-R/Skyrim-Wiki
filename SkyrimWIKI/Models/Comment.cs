@@ -21,6 +21,10 @@ public class Comment : BaseEntity
     [StringLength(100)]
     public string AuthorName { get; set; } = string.Empty;
 
+    // The account id, kept so that a user can delete only their own comments.
+    [StringLength(450)]
+    public string? AuthorId { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public int QuestId { get; set; }

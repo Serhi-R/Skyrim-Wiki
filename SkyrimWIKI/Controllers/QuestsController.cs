@@ -15,15 +15,18 @@ public class QuestsController : Controller
 {
     private readonly IQuestRepository _quests;
     private readonly IRepository<Location> _locations;
+    private readonly IRepository<Comment> _comments;
     private readonly ImageStorage _images;
 
     public QuestsController(
         IQuestRepository quests,
         IRepository<Location> locations,
+        IRepository<Comment> comments,
         ImageStorage images)
     {
         _quests = quests;
         _locations = locations;
+        _comments = comments;
         _images = images;
     }
 
@@ -62,11 +65,17 @@ public class QuestsController : Controller
 
         var location = _locations.GetById(quest.LocationId);
 
+        var comments = _comments.Find(c => c.QuestId == id)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToList();
+
         var model = new QuestDetailsViewModel
         {
             Quest = quest,
             LocationName = location?.Name ?? "",
-            LocationRegion = location?.Region ?? ""
+            LocationRegion = location?.Region ?? "",
+            Comments = comments,
+            AverageRating = comments.Count == 0 ? 0 : comments.Average(c => c.Rating)
         };
 
         return View(model);
