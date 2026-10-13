@@ -1,0 +1,33 @@
+@model IEnumerable<SkyrimWIKI.Models.Race>
+@{
+    ViewData["Title"] = "Races";
+}
+
+<h1 class="text-2xl font-bold text-slate-900">
+    <span class="t-en">Races</span><span class="t-bg">Раси</span>
+</h1>
+<p class="mt-1 text-sm text-slate-500">
+    <span class="t-en">The peoples of Skyrim and their traits.</span>
+    <span class="t-bg">Народите на Скайрим и техните умения.</span>
+</p>
+
+<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @foreach (var race in Model)
+    {
+        <a asp-action="Details" asp-route-id="@race.Id"
+           class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md">
+            <div class="flex items-center justify-between gap-2">
+                <h2 class="font-semibold text-slate-900">@race.Name</h2>
+                @if (!race.Playable)
+                {
+                    <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-500">
+                        <span class="t-en">NPC</span><span class="t-bg">NPC</span>
+                    </span>
+                }
+            </div>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                @(race.Description.Length > 120 ? race.Description[..120] + "..." : race.Description)
+            </p>
+        </a>
+    }
+</div>

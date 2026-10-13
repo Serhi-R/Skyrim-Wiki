@@ -1,0 +1,31 @@
+@model IEnumerable<SkyrimWIKI.Models.ViewModels.LocationCardViewModel>
+@{
+    ViewData["Title"] = "Locations";
+}
+
+<h1 class="text-2xl font-bold text-slate-900">
+    <span class="t-en">Locations</span><span class="t-bg">Локации</span>
+</h1>
+<p class="mt-1 text-sm text-slate-500">
+    <span class="t-en">Places of Skyrim and the quests that happen there.</span>
+    <span class="t-bg">Местата в Скайрим и заданията, които се случват там.</span>
+</p>
+
+<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @foreach (var card in Model)
+    {
+        <a asp-action="Details" asp-route-id="@card.Location.Id"
+           class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md">
+            <div class="flex items-center justify-between gap-2">
+                <h2 class="font-semibold text-slate-900">@card.Location.Name</h2>
+                <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                    @card.QuestCount <span class="t-en">quests</span><span class="t-bg">задания</span>
+                </span>
+            </div>
+            <p class="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">@card.Location.Region</p>
+            <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                @(card.Location.Description.Length > 120 ? card.Location.Description[..120] + "..." : card.Location.Description)
+            </p>
+        </a>
+    }
+</div>
