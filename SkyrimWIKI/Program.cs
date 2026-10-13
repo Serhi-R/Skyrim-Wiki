@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SkyrimWIKI.Data;
 using SkyrimWIKI.Models;
 using SkyrimWIKI.Repositories;
+using SkyrimWIKI.Services;
 
 // Entry point: first services are registered, then the HTTP pipeline is built.
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,9 @@ builder.Services
 // Repository<Product>. No line is needed per entity.
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
+// --- File uploads ---------------------------------------------------------
+builder.Services.AddScoped<ImageStorage>();
+
 // --- MVC + Razor Pages ----------------------------------------------------
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -56,6 +60,11 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// MapStaticAssets only serves files known at build time, so the classic
+// middleware is kept for uploaded images.
+app.UseStaticFiles();
+
 app.UseRouting();
 
 // Authentication first ("who is the user?"), then authorization ("may they do

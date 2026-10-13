@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SkyrimWIKI.Models;
 
@@ -25,10 +26,16 @@ public class Quest : BaseEntity
     [Display(Name = "Reward")]
     public string Reward { get; set; } = string.Empty;
 
-    // Relative path under wwwroot, e.g. /uploads/quest-1.png. Null when the
-    // quest has no image yet.
+    // Relative path under wwwroot, e.g. /uploads/quests/quest-1.png. Null when
+    // the quest has no image yet.
     [StringLength(500)]
     public string? ImagePath { get; set; }
+
+    // The file posted from the form. It is never stored in the database; the
+    // controller saves it and keeps the path in ImagePath.
+    [NotMapped]
+    [Display(Name = "Image")]
+    public IFormFile? Image { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

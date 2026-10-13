@@ -47,4 +47,17 @@
                class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
         <span asp-validation-for="Reward" class="mt-1 block text-sm text-rose-600"></span>
     </div>
+
+    <div>
+        <label asp-for="Image" class="mb-1 block text-sm font-medium text-slate-700">
+            <span class="t-en">Image</span><span class="t-bg">Изображение</span>
+        </label>
+        <input asp-for="Image" type="file" accept=".jpg,.jpeg,.png,.webp"
+               class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" />
+        <p class="mt-1 text-xs text-slate-400">
+            <span class="t-en">jpg, png or webp, up to 2 MB</span>
+            <span class="t-bg">jpg, png или webp, до 2 MB</span>
+        </p>
+        <span asp-validation-for="Image" class="mt-1 block text-sm text-rose-600"></span>
+    </div>
 </div>

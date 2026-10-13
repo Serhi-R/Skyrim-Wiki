@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SkyrimWIKI.Models;
 using SkyrimWIKI.Models.ViewModels;
 using SkyrimWIKI.Repositories;
+using SkyrimWIKI.Services;
 
 namespace SkyrimWIKI.Controllers;
 
@@ -14,11 +15,16 @@ public class QuestsController : Controller
 {
     private readonly IRepository<Quest> _quests;
     private readonly IRepository<Location> _locations;
+    private readonly ImageStorage _images;
 
-    public QuestsController(IRepository<Quest> quests, IRepository<Location> locations)
+    public QuestsController(
+        IRepository<Quest> quests,
+        IRepository<Location> locations,
+        ImageStorage images)
     {
         _quests = quests;
         _locations = locations;
+        _images = images;
     }
 
     public IActionResult Index()
@@ -63,12 +69,19 @@ public class QuestsController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public IActionResult Create(Quest quest)
+    public async Task<IActionResult> Create(Quest quest)
     {
+        ValidateImage(quest);
+
         if (!ModelState.IsValid)
         {
             LoadLocations(quest.LocationId);
             return View(quest);
+        }
+
+        if (quest.Image is { Length: > 0 })
+        {
+            quest.ImagePath = await _images.SaveAsync(quest.Image);
         }
 
         _quests.Add(quest);
@@ -93,7 +106,7 @@ public class QuestsController : Controller
     [HttpPost]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, Quest quest)
+    public async Task<IActionResult> Edit(int id, Quest quest)
     {
         if (id != quest.Id)
         {
@@ -105,6 +118,8 @@ public class QuestsController : Controller
         {
             return NotFound();
         }
+
+        ValidateImage(quest);
 
         if (!ModelState.IsValid)
         {
@@ -118,6 +133,14 @@ public class QuestsController : Controller
         existing.Level = quest.Level;
         existing.Reward = quest.Reward;
         existing.LocationId = quest.LocationId;
+
+        if (quest.Image is { Length: > 0 })
+        {
+            // The old file is removed only after the new one is safely saved.
+            var previousImage = existing.ImagePath;
+            existing.ImagePath = await _images.SaveAsync(quest.Image);
+            _images.Delete(previousImage);
+        }
 
         _quests.Update(existing);
         _quests.SaveChanges();
@@ -144,10 +167,23 @@ public class QuestsController : Controller
             return NotFound();
         }
 
+        _images.Delete(quest.ImagePath);
         _quests.Remove(quest);
         _quests.SaveChanges();
 
         return RedirectToAction(nameof(Index));
+    }
+
+    // The file is checked here because data annotations cannot express
+    // "jpg, png or webp under 2 MB".
+    private void ValidateImage(Quest quest)
+    {
+        if (quest.Image is { Length: > 0 } && !_images.IsAllowed(quest.Image))
+        {
+            ModelState.AddModelError(
+                nameof(Quest.Image),
+                "Choose a jpg, png or webp image up to 2 MB.");
+        }
     }
 
     // Fills the location dropdown. The selected id is passed in on POST so the
