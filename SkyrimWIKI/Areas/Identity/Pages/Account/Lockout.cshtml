@@ -1,0 +1,12 @@
+@page
+@model LockoutModel
+@{
+    ViewData["Title"] = "Account locked";
+}
+
+<div class="frame mx-auto max-w-md p-6 text-center">
+    <p class="text-sm font-semibold text-ember-text">Account locked</p>
+    <h1 class="page-title mt-2 text-2xl">Too many attempts</h1>
+    <p class="mt-2 text-sm text-dust">This account has been locked. Please try again later.</p>
+    <a asp-page="./Login" class="link mt-4 inline-block">Back to log in</a>
+</div>

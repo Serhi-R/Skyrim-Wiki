@@ -7,6 +7,9 @@
     <!-- Some Linux SDK builds ship without the PrunePackageData folder, which
          makes restore fail with NETSDK1226. Harmless elsewhere. -->
     <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
+    <!-- Admin credentials for local development live in user-secrets, never in
+         appsettings.json. See the README for the two commands. -->
+    <UserSecretsId>skyrimwiki-local</UserSecretsId>
   </PropertyGroup>
 
   <!-- Package versions follow the target framework: a 9.x project must not
@@ -46,5 +49,8 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Localization\**\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

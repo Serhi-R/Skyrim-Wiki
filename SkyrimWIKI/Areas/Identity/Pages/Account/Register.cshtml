@@ -5,59 +5,53 @@
 }
 
 <div class="mx-auto max-w-md">
-    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 class="mb-1 text-2xl font-bold text-slate-900">
-            <span class="t-en">Register</span><span class="t-bg">Регистрация</span>
-        </h1>
-        <p class="mb-5 text-sm text-slate-500">
-            <span class="t-en">Create an account to comment on quests.</span>
-            <span class="t-bg">Създайте профил, за да коментирате.</span>
-        </p>
+    <div class="frame p-6">
+        <h1 class="page-title text-2xl">Register</h1>
+        <p class="mt-2 text-sm text-dust">Create an account to comment on quests.</p>
+        <hr class="divider-gold mt-4 w-full" />
 
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="space-y-4">
-            <div asp-validation-summary="ModelOnly"
-                 class="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700"
-                 role="alert"></div>
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="mt-5 space-y-4">
+            <div asp-validation-summary="ModelOnly" class="note-error" role="alert"></div>
 
             <div>
-                <label asp-for="Input.Email" class="mb-1 block text-sm font-medium text-slate-700">
-                    <span class="t-en">Email</span><span class="t-bg">Имейл</span>
-                </label>
+                <label asp-for="Input.Email" class="label">Email</label>
                 <input asp-for="Input.Email" autocomplete="username" aria-required="true"
-                       placeholder="name@example.com"
-                       class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
-                <span asp-validation-for="Input.Email" class="mt-1 block text-sm text-rose-600"></span>
+                       placeholder="name@example.com" class="input" />
+                <span asp-validation-for="Input.Email"></span>
             </div>
 
             <div>
-                <label asp-for="Input.Password" class="mb-1 block text-sm font-medium text-slate-700">
-                    <span class="t-en">Password</span><span class="t-bg">Парола</span>
-                </label>
-                <input asp-for="Input.Password" type="password" autocomplete="new-password"
-                       aria-required="true" placeholder="password"
-                       class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
-                <span asp-validation-for="Input.Password" class="mt-1 block text-sm text-rose-600"></span>
+                <label asp-for="Input.Password" class="label">Password</label>
+                <div class="relative">
+                    <input asp-for="Input.Password" type="password" autocomplete="new-password"
+                           aria-required="true" placeholder="password" class="input pr-24" />
+                    <button type="button" data-toggle-password="#Input_Password" aria-pressed="false"
+                            class="absolute inset-y-0 right-2 my-auto h-7 rounded-sm border border-gold/30 px-2 text-xs font-semibold text-dust hover:border-gold/60 hover:text-gold">
+                        Show
+                    </button>
+                </div>
+                <p class="mt-1 text-xs text-dust">At least 8 characters, with upper and lower case letters and a digit.</p>
+                <span asp-validation-for="Input.Password"></span>
             </div>
 
             <div>
-                <label asp-for="Input.ConfirmPassword" class="mb-1 block text-sm font-medium text-slate-700">
-                    <span class="t-en">Confirm password</span><span class="t-bg">Потвърдете паролата</span>
-                </label>
-                <input asp-for="Input.ConfirmPassword" type="password" autocomplete="new-password"
-                       aria-required="true" placeholder="password"
-                       class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
-                <span asp-validation-for="Input.ConfirmPassword" class="mt-1 block text-sm text-rose-600"></span>
+                <label asp-for="Input.ConfirmPassword" class="label">Confirm password</label>
+                <div class="relative">
+                    <input asp-for="Input.ConfirmPassword" type="password" autocomplete="new-password"
+                           aria-required="true" placeholder="password" class="input pr-24" />
+                    <button type="button" data-toggle-password="#Input_ConfirmPassword" aria-pressed="false"
+                            class="absolute inset-y-0 right-2 my-auto h-7 rounded-sm border border-gold/30 px-2 text-xs font-semibold text-dust hover:border-gold/60 hover:text-gold">
+                        Show
+                    </button>
+                </div>
+                <span asp-validation-for="Input.ConfirmPassword"></span>
             </div>
 
-            <button id="registerSubmit" type="submit"
-                    class="w-full rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
-                <span class="t-en">Register</span><span class="t-bg">Регистрация</span>
-            </button>
+            <button id="registerSubmit" type="submit" class="btn btn-solid btn-block">Register</button>
 
-            <p class="text-sm text-slate-500">
-                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-emerald-700 hover:underline">
-                    <span class="t-en">Already have an account? Log in</span>
-                    <span class="t-bg">Вече имате профил? Влезте</span>
+            <p class="text-sm text-dust">
+                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="link">
+                    Already have an account? Log in
                 </a>
             </p>
         </form>

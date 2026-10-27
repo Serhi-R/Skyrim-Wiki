@@ -54,7 +54,7 @@ public class CommentsController : ControllerBase
             AverageRating = comments.Count == 0
                 ? 0
                 : Math.Round(comments.Average(c => c.Rating), 1),
-            Items = comments.Select(c => ToDto(c, currentUserId)).ToList()
+            Items = comments.Select(c => ToDto(c, currentUserId, User.IsInRole("Admin"))).ToList()
         };
 
         return Ok(response);
@@ -95,7 +95,7 @@ public class CommentsController : ControllerBase
         return CreatedAtAction(
             nameof(GetByQuest),
             new { questId = comment.QuestId },
-            ToDto(comment, user.Id));
+            ToDto(comment, user.Id, User.IsInRole("Admin")));
     }
 
     [HttpDelete("{id:int}")]
@@ -109,8 +109,10 @@ public class CommentsController : ControllerBase
             return NotFound();
         }
 
-        // A comment can only be removed by the account that wrote it.
-        if (comment.AuthorId != _users.GetUserId(User))
+        // A comment can only be removed by the account that wrote it,
+        // or by an administrator.
+        var currentUserId = _users.GetUserId(User);
+        if (comment.AuthorId != currentUserId && !User.IsInRole("Admin"))
         {
             return Forbid();
         }
@@ -125,7 +127,7 @@ public class CommentsController : ControllerBase
         return NoContent();
     }
 
-    private static CommentDto ToDto(Comment comment, string? currentUserId)
+    private static CommentDto ToDto(Comment comment, string? currentUserId, bool isAdmin = false)
     {
         return new CommentDto
         {
@@ -134,7 +136,7 @@ public class CommentsController : ControllerBase
             Text = comment.Text,
             Rating = comment.Rating,
             CreatedAt = comment.CreatedAt,
-            CanDelete = currentUserId is not null && comment.AuthorId == currentUserId
+            CanDelete = currentUserId is not null && (comment.AuthorId == currentUserId || isAdmin)
         };
     }
 }

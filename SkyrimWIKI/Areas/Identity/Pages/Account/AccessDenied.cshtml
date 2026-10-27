@@ -1,0 +1,12 @@
+@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Access denied";
+}
+
+<div class="frame mx-auto max-w-md p-6 text-center">
+    <p class="text-sm font-semibold text-ember-text">Error 403</p>
+    <h1 class="page-title mt-2 text-2xl">Access denied</h1>
+    <p class="mt-2 text-sm text-dust">You do not have permission to view this page.</p>
+    <a asp-area="" asp-controller="Home" asp-action="Index" class="link mt-4 inline-block">Back to home</a>
+</div>

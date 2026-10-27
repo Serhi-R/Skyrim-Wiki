@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using SkyrimWIKI.Data;
+using SkyrimWIKI.Middleware;
 using SkyrimWIKI.Models;
 using SkyrimWIKI.Repositories;
 using SkyrimWIKI.Services;
@@ -37,19 +38,44 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     DatabaseProviderSelector.Configure(options, builder.Configuration));
 
 // --- Identity -------------------------------------------------------------
-// Accounts, hashed passwords, cookies and sign-in. Password rules are relaxed
-// for coursework; tighten them for a real application.
+// Accounts, hashed passwords, cookies and sign-in. The admin password is not
+// in appsettings.json: it is read from user-secrets in development and from
+// environment variables in production.
 builder.Services
     .AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
-        options.Password.RequiredLength = 6;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
+
+        options.Password.RequiredLength = 8;
         options.Password.RequireDigit = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+
+        // Five wrong passwords lock the account for five minutes, which slows
+        // down online guessing without locking honest users out for long.
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+
+        options.User.RequireUniqueEmail = true;
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
+
+// Sign-in cookie: HttpOnly and SameSite=Lax so the antiforgery cookie and the
+// auth cookie survive normal top level navigation but not cross-site posts.
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
 
 // --- Repository -----------------------------------------------------------
 // One open-generic registration: IRepository<Product> resolves to
@@ -63,6 +89,17 @@ builder.Services.AddScoped<IQuestRepository, QuestRepository>();
 // --- File uploads ---------------------------------------------------------
 builder.Services.AddScoped<ImageStorage>();
 
+// Resolves the picture for an entity: game drop first, then the fallback.
+// Stateless and read-only, so one instance can be shared.
+builder.Services.AddSingleton<GameImages>();
+
+// --- Localization ---------------------------------------------------------
+// The translation tables are loaded once; the per-request Localizer reads the
+// chosen language from the "lang" cookie.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<LocalizationStore>();
+builder.Services.AddScoped<Localizer>();
+
 // --- MVC + Razor Pages ----------------------------------------------------
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
@@ -72,6 +109,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery(options => options.HeaderName = "RequestVerificationToken");
 
 var app = builder.Build();
+
+// Hardening headers are attached to every response, including error pages.
+app.UseMiddleware<SecurityHeadersMiddleware>();
 
 // Apply pending migrations and seed the database before the first request.
 using (var scope = app.Services.CreateScope())
@@ -96,16 +136,33 @@ else
 
 // 404s and other error statuses are re executed through the controller, so
 // the user sees a real page inside the layout instead of an empty body.
-app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
+// Re execution keeps the original HTTP method, and the status page is GET only,
+// so this is limited to GET and HEAD. Without the guard a failed POST (for
+// example a missing antiforgery token) would re execute as POST /status and the
+// client would see 405 instead of the real 400.
+app.UseWhen(
+    context => HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method),
+    branch => branch.UseStatusCodePagesWithReExecute("/status", "?code={0}"));
 
 app.UseHttpsRedirection();
 
 // One log entry per request: method, path, status code and duration.
 app.UseSerilogRequestLogging();
 
-// MapStaticAssets only serves files known at build time, so the classic
-// middleware is kept for uploaded images.
-app.UseStaticFiles();
+// Every static file (css, js, images, fonts and uploads) is served here and the
+// layout versions its links with asp-append-version. One mechanism, one URL,
+// valid on every route: no build-time fingerprinted paths that go stale when
+// the css is rebuilt without a full dotnet build.
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        context.Context.Response.Headers.CacheControl = "public, max-age=604800";
+    }
+});
+
+// Restore real Identity field names before model binding
+app.UseFormFieldObfuscation();
 
 app.UseRouting();
 
@@ -114,19 +171,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
-// /Quests/Edit/5 -> QuestsController.Edit(5).
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-// Attribute routed controllers: /api/comments.
+// Every MVC controller uses attribute routing, so no conventional route is
+// registered. The controllers define lowercase URLs: /, /quests, /quests/5,
+// /races, /locations and the /api/* endpoints.
 app.MapControllers();
 
 // Identity screens: /Identity/Account/Login, Register, Logout.
-app.MapRazorPages()
-    .WithStaticAssets();
+app.MapRazorPages();
 
 app.Run();
