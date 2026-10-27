@@ -39,3 +39,4 @@ node_modules/
 # Uploaded quest images - keep the folder, ignore its content
 SkyrimWIKI/wwwroot/uploads/quests/*
 !SkyrimWIKI/wwwroot/uploads/quests/.gitkeep
+.opencode/
