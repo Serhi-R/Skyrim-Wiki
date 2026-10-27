@@ -1,0 +1,21 @@
+@model int
+@{
+    ViewData["Title"] = $"{L["status.title"]} {Model}";
+    var heading = Model switch
+    {
+        404 => L["status.notFound"],
+        403 => L["status.forbidden"],
+        400 => L["status.badRequest"],
+        _ => L["status.error"]
+    };
+    var text = Model == 404 ? L["status.text"] : L["error.text"];
+}
+
+<div class="frame mx-auto max-w-lg p-8 text-center">
+    <p class="font-display text-5xl font-bold text-brass">@Model</p>
+    <h1 class="page-title mt-3 text-xl">@heading</h1>
+    <p class="mt-2 text-sm text-parchment/85">
+        @text
+    </p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-solid mt-6">@L["status.backHome"]</a>
+</div>
