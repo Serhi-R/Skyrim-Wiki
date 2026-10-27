@@ -5,7 +5,7 @@ const STAR_PATH =
 export function Star({ filled, size = "h-4 w-4" }: { filled: boolean; size?: string }) {
   return (
     <svg
-      className={`${size} ${filled ? "text-amber-400" : "text-slate-300"}`}
+      className={`${size} ${filled ? "text-gold" : "text-brass/30"}`}
       viewBox="0 0 20 20"
       fill="currentColor"
       aria-hidden="true"

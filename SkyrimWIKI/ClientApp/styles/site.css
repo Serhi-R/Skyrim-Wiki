@@ -1,15 +1,527 @@
 @import "tailwindcss";
 
+/* Self-hosted fonts, copied from the @fontsource packages into wwwroot/fonts.
+   No requests leave the site for fonts. */
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/cinzel-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/cinzel-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/cinzel-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Cinzel";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/cinzel-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/eb-garamond-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/eb-garamond-400-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/eb-garamond-500.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/eb-garamond-600.woff2") format("woff2");
+}
+@font-face {
+  font-family: "EB Garamond";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/eb-garamond-700.woff2") format("woff2");
+}
+
 @source "../../Views";
 @source "../../Areas";
 @source "..";
 
-/* Bilingual UI: every translated string has a t-en and a t-bg span, and only
-   the one matching the current language is displayed. */
-[data-lang="en"] .t-bg {
-  display: none;
+/* Nordic stone palette: night slate background, cold stone surfaces, slate
+   blue borders, frost text and an aged gold used only as an accent. Blood red
+   is reserved for destructive actions. The token names are kept from the first
+   theme so every existing utility class adopts the new values at once. */
+@theme {
+  --color-night: #0f1318;
+  --color-abyss: #0b0e12;
+  --color-panel: #1b232c;
+  --color-panel-2: #222c37;
+  --color-slate: #2e3a46;
+  --color-frost: #d9e2ea;
+  --color-ice: #9fb0c0;
+  --color-gold: #c9a24a;
+  --color-brass: #9a7c36;
+  --color-candle: #e7ce8b;
+  --color-blood: #8c2f2b;
+  --color-blood-2: #b23a34;
+  --color-blood-light: #e8a9a3;
+
+  /* Aliases kept for the existing views. */
+  --color-parchment: #d9e2ea;
+  --color-dust: #9fb0c0;
+  --color-ivory: #eef3f8;
+  --color-ember: #8c2f2b;
+  --color-ember-2: #b23a34;
+  --color-ember-text: #e8a9a3;
+
+  --font-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --font-body: "EB Garamond", "Palatino Linotype", Georgia, serif;
 }
 
-[data-lang="bg"] .t-en {
-  display: none;
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-frost);
+    background-color: var(--color-night);
+    background-image:
+      radial-gradient(1100px 560px at 50% -10%, rgba(46, 58, 70, 0.55), transparent 62%),
+      radial-gradient(900px 520px at 12% 6%, rgba(159, 176, 192, 0.08), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  /* Faint grain overlay so surfaces read as stone instead of flat digital
+     black. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    color: var(--color-ivory);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-abyss);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.001ms !important;
+      animation-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-abyss);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-slate) 80%, transparent);
+    border: 2px solid var(--color-abyss);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold);
+  }
 }
+
+@layer components {
+  .skip-link {
+    position: absolute;
+    left: 0.75rem;
+    top: -3rem;
+    z-index: 50;
+    padding: 0.5rem 0.85rem;
+    color: var(--color-abyss);
+    background: var(--color-gold);
+    border-radius: 2px;
+    transition: top 0.15s ease;
+  }
+
+  .skip-link:focus {
+    top: 0.75rem;
+  }
+
+  /* Cold stone panel: slate hairline border over a stone gradient. Gold is not
+     used on the resting border, only on interaction. */
+  .frame {
+    position: relative;
+    border: 1px solid var(--color-slate);
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--color-panel-2), var(--color-panel));
+    box-shadow:
+      inset 0 1px 0 rgba(233, 240, 248, 0.04),
+      0 10px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .frame-hover {
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .frame-hover:hover {
+    border-color: color-mix(in srgb, var(--color-gold) 45%, var(--color-slate));
+    box-shadow:
+      0 0 22px rgba(201, 162, 74, 0.1),
+      0 12px 26px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    padding: 0.62rem 1.05rem;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-sm {
+    padding: 0.42rem 0.72rem;
+    font-size: 0.74rem;
+  }
+
+  .btn-block {
+    width: 100%;
+  }
+
+  .btn-gold {
+    color: var(--color-gold);
+    border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
+    background: transparent;
+  }
+
+  .btn-gold:hover:not(:disabled) {
+    color: var(--color-candle);
+    border-color: var(--color-gold);
+    background: color-mix(in srgb, var(--color-gold) 14%, transparent);
+  }
+
+  .btn-solid {
+    color: var(--color-abyss);
+    background: linear-gradient(180deg, var(--color-candle), var(--color-gold));
+    border-color: color-mix(in srgb, var(--color-gold) 70%, transparent);
+  }
+
+  .btn-solid:hover:not(:disabled) {
+    background: linear-gradient(180deg, #f2dfa6, var(--color-candle));
+    box-shadow: 0 0 18px rgba(201, 162, 74, 0.26);
+  }
+
+  .btn-ghost {
+    color: var(--color-frost);
+    border-color: var(--color-slate);
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    color: var(--color-candle);
+    border-color: color-mix(in srgb, var(--color-gold) 60%, var(--color-slate));
+  }
+
+  .btn-danger {
+    color: var(--color-frost);
+    border-color: color-mix(in srgb, var(--color-blood-2) 60%, transparent);
+    background: color-mix(in srgb, var(--color-blood) 45%, transparent);
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    color: #fff;
+    background: var(--color-blood);
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    color: var(--color-ivory);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid var(--color-slate);
+    border-radius: 2px;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .input::placeholder {
+    color: color-mix(in srgb, var(--color-ice) 75%, transparent);
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-gold) 55%, transparent),
+      0 0 16px rgba(201, 162, 74, 0.14);
+  }
+
+  select.input option {
+    background: var(--color-panel);
+    color: var(--color-ivory);
+  }
+
+  input[type="file"].input {
+    padding: 0.35rem;
+    font-size: 0.9rem;
+    color: var(--color-ice);
+  }
+
+  input[type="file"].input::file-selector-button {
+    margin-right: 0.75rem;
+    padding: 0.4rem 0.7rem;
+    color: var(--color-gold);
+    font-family: var(--font-display);
+    font-size: 0.74rem;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 40%, transparent);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  input[type="file"].input::file-selector-button:hover {
+    color: var(--color-candle);
+    border-color: var(--color-gold);
+  }
+
+  input[type="checkbox"] {
+    accent-color: var(--color-gold);
+  }
+
+  /* Field labels are sentence case, not tracked caps. */
+  .label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--color-ice);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.16rem 0.55rem;
+    color: var(--color-gold);
+    font-family: var(--font-display);
+    font-size: 0.76rem;
+    font-weight: 600;
+    background: color-mix(in srgb, var(--color-gold) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    border-radius: 2px;
+  }
+
+  .badge-muted {
+    color: var(--color-ice);
+    background: rgba(0, 0, 0, 0.25);
+    border-color: var(--color-slate);
+  }
+
+  .link {
+    color: var(--color-gold);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .link:hover {
+    color: var(--color-candle);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .page-title {
+    color: var(--color-ivory);
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .section-title {
+    color: var(--color-ivory);
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .stat-num {
+    color: var(--color-gold);
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+
+  .divider-gold {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--color-slate) 90%, var(--color-gold)),
+      transparent
+    );
+  }
+
+  .empty {
+    padding: 2rem 1.5rem;
+    color: var(--color-ice);
+    text-align: center;
+    border: 1px dashed var(--color-slate);
+    border-radius: 3px;
+  }
+
+  .note-error {
+    padding: 0.5rem 0.75rem;
+    color: var(--color-blood-light);
+    font-size: 0.95rem;
+    background: color-mix(in srgb, var(--color-blood) 28%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-blood-2) 45%, transparent);
+    border-radius: 2px;
+  }
+
+  .note-ok {
+    color: #a9c98a;
+  }
+
+  /* Small meta line: sentence case, ice coloured. */
+  .meta {
+    color: var(--color-ice);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Photographic surface used by the hero and the hold cards. */
+  .cover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  [data-valmsg-for] {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--color-blood-light);
+    font-size: 0.9rem;
+  }
+}
+
+  /* Subtle entrance animation */
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .frame,
+  .card,
+  article,
+  section {
+    animation: fade-in-up 320ms ease-out;
+  }
+
+  .frame-hover {
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+  }
+
+  .frame-hover:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--color-gold) 40%, var(--color-slate));
+    box-shadow: 0 10px 40px -20px rgba(201, 162, 74, 0.4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .frame,
+    .card,
+    article,
+    section {
+      animation: none;
+    }
+
+    .frame-hover:hover {
+      transform: none;
+    }
+  }

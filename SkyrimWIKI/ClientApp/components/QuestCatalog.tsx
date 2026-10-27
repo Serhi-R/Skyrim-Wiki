@@ -7,6 +7,53 @@ import {
   type QuestQuery,
 } from "../api";
 
+const STRINGS = {
+  en: {
+    search: "Search",
+    location: "Location",
+    allLocations: "All locations",
+    level: "Level",
+    sortBy: "Sort by",
+    sortTitle: "Title",
+    sortLevelAsc: "Level, low to high",
+    sortLevelDesc: "Level, high to low",
+    sortNewest: "Newest first",
+    sortOldest: "Oldest first",
+    sortLocation: "Location",
+    reset: "Reset",
+    found: "quests found",
+    exportCsv: "Export CSV",
+    loadError: "Could not load the quests. Please try again.",
+    nothing: "Nothing matches this filter.",
+    previous: "\u2190 Previous",
+    next: "Next \u2192",
+    page: "Page",
+    loading: "...",
+  },
+  bg: {
+    search: "Търсене",
+    location: "Локация",
+    allLocations: "Всички локации",
+    level: "Ниво",
+    sortBy: "Сортирай по",
+    sortTitle: "Заглавие",
+    sortLevelAsc: "Ниво, възходящо",
+    sortLevelDesc: "Ниво, низходящо",
+    sortNewest: "Най-нови първо",
+    sortOldest: "Най-стари първо",
+    sortLocation: "Локация",
+    reset: "Изчисти",
+    found: "намерени куеста",
+    exportCsv: "Експортирай CSV",
+    loadError: "Неуспешно зареждане на куестовете. Опитайте отново.",
+    nothing: "Няма резултати за този филтър.",
+    previous: "\u2190 Предишна",
+    next: "Следваща \u2192",
+    page: "Страница",
+    loading: "...",
+  },
+} as const;
+
 const EMPTY_QUERY: QuestQuery = {
   term: "",
   locationId: "",
@@ -20,24 +67,30 @@ const EMPTY_QUERY: QuestQuery = {
 function readQuery(): QuestQuery {
   const params = new URLSearchParams(window.location.search);
   return {
-    term: params.get("Term") ?? "",
-    locationId: params.get("LocationId") ?? "",
-    minLevel: params.get("MinLevel") ?? "",
-    maxLevel: params.get("MaxLevel") ?? "",
-    sort: params.get("Sort") ?? "title",
-    page: Number(params.get("Page") ?? "1") || 1,
+    term: params.get("term") ?? "",
+    locationId: params.get("locationId") ?? "",
+    minLevel: params.get("minLevel") ?? "",
+    maxLevel: params.get("maxLevel") ?? "",
+    sort: params.get("sort") ?? "title",
+    page: Number(params.get("page") ?? "1") || 1,
   };
 }
 
 function toSearchParams(query: QuestQuery): string {
   const params = new URLSearchParams();
-  if (query.term) params.set("Term", query.term);
-  if (query.locationId) params.set("LocationId", query.locationId);
-  if (query.minLevel) params.set("MinLevel", query.minLevel);
-  if (query.maxLevel) params.set("MaxLevel", query.maxLevel);
-  if (query.sort && query.sort !== "title") params.set("Sort", query.sort);
-  if (query.page > 1) params.set("Page", String(query.page));
+  if (query.term) params.set("term", query.term);
+  if (query.locationId) params.set("locationId", query.locationId);
+  if (query.minLevel) params.set("minLevel", query.minLevel);
+  if (query.maxLevel) params.set("maxLevel", query.maxLevel);
+  if (query.sort && query.sort !== "title") params.set("sort", query.sort);
+  if (query.page > 1) params.set("page", String(query.page));
   return params.toString();
+}
+
+function getLang(): "en" | "bg" {
+  const root = document.getElementById("quest-catalog");
+  const value = root?.dataset.lang;
+  return value === "bg" ? "bg" : "en";
 }
 
 export function QuestCatalog() {
@@ -47,10 +100,14 @@ export function QuestCatalog() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const t = STRINGS[getLang()];
+
   useEffect(() => {
-    fetchLocations()
+    const controller = new AbortController();
+    fetchLocations(controller.signal)
       .then(setLocations)
       .catch(() => setLocations([]));
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -58,34 +115,32 @@ export function QuestCatalog() {
     const url = `${window.location.pathname}${search ? `?${search}` : ""}`;
     window.history.replaceState(null, "", url);
 
-    let cancelled = false;
+    // 300 ms debounce keeps the API quiet while the search box is typed in,
+    // and the controller cancels a request that a newer keystroke replaced.
+    const controller = new AbortController();
     setLoading(true);
 
-    // A short delay keeps the API quiet while the search box is typed in.
     const timer = window.setTimeout(() => {
-      fetchQuests(query)
+      fetchQuests(query, controller.signal)
         .then((data) => {
-          if (!cancelled) {
-            setResult(data);
-            setError(null);
-          }
+          setResult(data);
+          setError(null);
+          setLoading(false);
         })
-        .catch(() => {
-          if (!cancelled) {
-            setError("Could not load the quests. Please try again.");
+        .catch((error: unknown) => {
+          if (error instanceof DOMException && error.name === "AbortError") {
+            return;
           }
-        })
-        .finally(() => {
-          if (!cancelled) {
-            setLoading(false);
-          }
+          setError(t.loadError);
+          setLoading(false);
         });
-    }, 250);
+    }, 300);
 
     return () => {
-      cancelled = true;
       window.clearTimeout(timer);
+      controller.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   // Any filter change starts again from page 1.
@@ -94,33 +149,27 @@ export function QuestCatalog() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-6">
+      <div className="frame grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
         <div className="lg:col-span-2">
-          <label htmlFor="Term" className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-400">
-            <span className="t-en">Search</span>
-            <span className="t-bg">Търсене</span>
-          </label>
+          <label htmlFor="Term" className="label mb-1 block">{t.search}</label>
           <input
             id="Term"
             value={query.term}
             onChange={(event) => update({ term: event.target.value })}
             placeholder="Barrow..."
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="input"
           />
         </div>
 
         <div>
-          <label htmlFor="LocationId" className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-400">
-            <span className="t-en">Location</span>
-            <span className="t-bg">Локация</span>
-          </label>
+          <label htmlFor="LocationId" className="label mb-1 block">{t.location}</label>
           <select
             id="LocationId"
             value={query.locationId}
             onChange={(event) => update({ locationId: event.target.value })}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="input"
           >
-            <option value="">All / Всички</option>
+            <option value="">{t.allLocations}</option>
             {locations.map((location) => (
               <option key={location.id} value={location.id}>
                 {location.name}
@@ -130,10 +179,7 @@ export function QuestCatalog() {
         </div>
 
         <div>
-          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-400">
-            <span className="t-en">Level</span>
-            <span className="t-bg">Ниво</span>
-          </label>
+          <label className="label mb-1 block">{t.level}</label>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -142,9 +188,9 @@ export function QuestCatalog() {
               value={query.minLevel}
               onChange={(event) => update({ minLevel: event.target.value })}
               placeholder="1"
-              className="w-full min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="input min-w-0"
             />
-            <span className="text-slate-400">-</span>
+            <span className="text-dust">-</span>
             <input
               type="number"
               min={1}
@@ -152,92 +198,66 @@ export function QuestCatalog() {
               value={query.maxLevel}
               onChange={(event) => update({ maxLevel: event.target.value })}
               placeholder="81"
-              className="w-full min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              className="input min-w-0"
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="Sort" className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-400">
-            <span className="t-en">Sort by</span>
-            <span className="t-bg">Сортиране</span>
-          </label>
+          <label htmlFor="Sort" className="label mb-1 block">{t.sortBy}</label>
           <select
             id="Sort"
             value={query.sort}
             onChange={(event) => update({ sort: event.target.value })}
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            className="input"
           >
-            <option value="title">Title / Заглавие</option>
-            <option value="level">Level, low to high / Ниво, възходящо</option>
-            <option value="level_desc">Level, high to low / Ниво, низходящо</option>
-            <option value="newest">Newest first / Най-нови първо</option>
-            <option value="oldest">Oldest first / Най-стари първо</option>
-            <option value="location">Location / Локация</option>
+            <option value="title">{t.sortTitle}</option>
+            <option value="level">{t.sortLevelAsc}</option>
+            <option value="level_desc">{t.sortLevelDesc}</option>
+            <option value="newest">{t.sortNewest}</option>
+            <option value="oldest">{t.sortOldest}</option>
+            <option value="location">{t.sortLocation}</option>
           </select>
         </div>
 
         <div className="flex items-end">
-          <button
-            type="button"
-            onClick={() => setQuery(EMPTY_QUERY)}
-            className="w-full rounded-md bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
-          >
-            <span className="t-en">Reset</span>
-            <span className="t-bg">Изчисти</span>
+          <button type="button" onClick={() => setQuery(EMPTY_QUERY)} className="btn btn-ghost btn-block">
+            {t.reset}
           </button>
         </div>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-sm text-slate-500">
-          {result ? result.totalCount : 0}
-          <span className="t-en">quests found</span>
-          <span className="t-bg">намерени задания</span>
-          {loading && <span className="text-xs text-slate-400">...</span>}
+        <p className="flex items-center gap-2 text-sm text-dust">
+          {result ? result.totalCount : 0} {t.found}
+          {loading && <span className="text-xs text-dust/70">{t.loading}</span>}
         </p>
 
-        <a
-          href={`/Quests/Export?${toSearchParams(query)}`}
-          className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-        >
-          <span className="t-en">Export CSV</span>
-          <span className="t-bg">Експорт CSV</span>
+        <a href={`/quests/export?${toSearchParams(query)}`} className="btn btn-ghost btn-sm">
+          {t.exportCsv}
         </a>
       </div>
 
-      {error && (
-        <p className="mt-3 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>
-      )}
+      {error && <p className="note-error mt-3">{error}</p>}
 
       {result && result.items.length === 0 && !loading && (
-        <p className="mt-6 rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">
-          <span className="t-en">Nothing matches this filter.</span>
-          <span className="t-bg">Няма задания по този филтър.</span>
-        </p>
+        <p className="empty mt-6">{t.nothing}</p>
       )}
 
       {result && result.items.length > 0 && (
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {result.items.map((quest) => (
-            <div
-              key={quest.id}
-              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md"
-            >
+            <div key={quest.id} className="frame frame-hover h-full p-5">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="break-words font-semibold text-slate-900">
-                  <a href={`/Quests/Details/${quest.id}`} className="hover:text-emerald-700">
+                <h3 className="break-words font-display font-semibold text-ivory">
+                  <a href={`/quests/${quest.id}`} className="hover:text-candle">
                     {quest.title}
                   </a>
                 </h3>
-                <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                  Lv. {quest.level}
-                </span>
+                <span className="badge shrink-0">Lv. {quest.level}</span>
               </div>
-              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">
-                {quest.locationName}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{quest.excerpt}</p>
+              <p className="meta mt-2">{quest.locationName}</p>
+              <p className="mt-2 text-sm leading-relaxed text-parchment/85">{quest.excerpt}</p>
             </div>
           ))}
         </div>
@@ -249,23 +269,20 @@ export function QuestCatalog() {
             type="button"
             disabled={query.page <= 1}
             onClick={() => setQuery((current) => ({ ...current, page: current.page - 1 }))}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="btn btn-ghost btn-sm"
           >
-            &larr; <span className="t-en">Previous</span>
-            <span className="t-bg">Предишна</span>
+            {t.previous}
           </button>
-          <span className="px-3 text-sm text-slate-500">
-            <span className="t-en">Page</span>
-            <span className="t-bg">Страница</span> {result.page} / {result.totalPages}
+          <span className="px-3 text-sm text-dust">
+            {t.page} {result.page} / {result.totalPages}
           </span>
           <button
             type="button"
             disabled={query.page >= result.totalPages}
             onClick={() => setQuery((current) => ({ ...current, page: current.page + 1 }))}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="btn btn-ghost btn-sm"
           >
-            <span className="t-en">Next</span>
-            <span className="t-bg">Следваща</span> &rarr;
+            {t.next}
           </button>
         </nav>
       )}

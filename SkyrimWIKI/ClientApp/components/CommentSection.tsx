@@ -8,12 +8,51 @@ import {
 import { Stars, Star } from "./Stars";
 
 const LABELS = [
-  "Poor / Слабо",
-  "Fair / Задоволително",
-  "Good / Добро",
-  "Great / Много добро",
-  "Excellent / Отлично",
+  "Poor",
+  "Fair",
+  "Good",
+  "Great",
+  "Excellent",
 ];
+
+const STRINGS = {
+  en: {
+    title: "Comments",
+    rating: "Your rating",
+    placeholder: "Share your experience...",
+    post: "Post comment",
+    signIn: "Sign in",
+    toComment: "to leave a rating and a comment.",
+    saved: "Comment saved.",
+    loadError: "Could not load the comments.",
+    saveError: "Could not save the comment.",
+    deleteError: "Could not delete the comment.",
+    confirmDelete: "Delete this comment?",
+    none: "No comments yet. Be the first.",
+    delete: "Delete",
+  },
+  bg: {
+    title: "Коментари",
+    rating: "Вашата оценка",
+    placeholder: "Споделете впечатленията си...",
+    post: "Публикувай коментар",
+    signIn: "Влезте",
+    toComment: "за да оставите оценка и коментар.",
+    saved: "Коментарът е запазен.",
+    loadError: "Неуспешно зареждане на коментарите.",
+    saveError: "Неуспешно запазване на коментара.",
+    deleteError: "Неуспешно изтриване на коментара.",
+    confirmDelete: "Изтрийте този коментар?",
+    none: "Все още няма коментари. Бъдете първи.",
+    delete: "Изтрий",
+  },
+} as const;
+
+function getLang(): "en" | "bg" {
+  const root = document.getElementById("quest-comments");
+  const value = root?.dataset.lang;
+  return value === "bg" ? "bg" : "en";
+}
 
 // Loads the comments of one quest from the API and lets a signed in user add
 // or delete their own comment with a star rating.
@@ -31,13 +70,15 @@ export function CommentSection({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
+  const t = STRINGS[getLang()];
+
   const load = () => {
     fetchComments(questId)
       .then((response) => {
         setData(response);
         setError(null);
       })
-      .catch(() => setError("Could not load the comments."));
+      .catch(() => setError(t.loadError));
   };
 
   useEffect(load, [questId]);
@@ -52,17 +93,17 @@ export function CommentSection({
       await createComment({ questId, text, rating });
       setText("");
       setRating(5);
-      setNotice("Comment saved. / Коментарът е запазен.");
+      setNotice(t.saved);
       load();
     } catch {
-      setError("Could not save the comment. / Коментарът не беше запазен.");
+      setError(t.saveError);
     } finally {
       setBusy(false);
     }
   };
 
   const remove = async (id: number) => {
-    if (!window.confirm("Delete this comment? / Да се изтрие ли коментарът?")) {
+    if (!window.confirm(t.confirmDelete)) {
       return;
     }
 
@@ -70,31 +111,30 @@ export function CommentSection({
       await deleteComment(id);
       load();
     } catch {
-      setError("Could not delete the comment.");
+      setError(t.deleteError);
     }
   };
 
   return (
-    <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="frame mt-8 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-slate-900">
-          <span className="t-en">Comments</span>
-          <span className="t-bg">Коментари</span>
+        <h2 className="section-title text-lg">
+          {t.title}
         </h2>
         <div className="flex items-center gap-2">
           <Stars rating={data?.averageRating ?? 0} />
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-dust">
             {(data?.averageRating ?? 0).toFixed(1)} / 5 ({data?.count ?? 0})
           </span>
         </div>
       </div>
+      <hr className="divider-gold mt-3 w-full" />
 
       {isAuthenticated ? (
-        <form onSubmit={submit} className="mt-5 rounded-lg bg-slate-50 p-4">
+        <form onSubmit={submit} className="mt-5 rounded-sm border border-gold/15 bg-black/25 p-4">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm font-medium text-slate-700">
-              <span className="t-en">Your rating</span>
-              <span className="t-bg">Твоята оценка</span>
+            <span className="meta">
+              {t.rating}
             </span>
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -119,67 +159,59 @@ export function CommentSection({
             required
             minLength={3}
             maxLength={1000}
-            placeholder="Share your experience... / Сподели опита си..."
-            className="mt-3 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            placeholder={t.placeholder}
+            className="input mt-3"
           />
 
           <button
             type="submit"
             disabled={busy || text.trim().length < 3}
-            className="mt-3 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn btn-solid mt-3"
           >
-            <span className="t-en">Post comment</span>
-            <span className="t-bg">Публикувай</span>
+            {t.post}
           </button>
         </form>
       ) : (
-        <p className="mt-4 text-sm text-slate-500">
-          <a
-            href="/Identity/Account/Login"
-            className="font-medium text-emerald-700 hover:underline"
-          >
-            <span className="t-en">Sign in</span>
-            <span className="t-bg">Влез</span>
+        <p className="mt-4 text-sm text-dust">
+          <a href="/Identity/Account/Login" className="link">
+            {t.signIn}
           </a>{" "}
-          <span className="t-en">to leave a rating and a comment.</span>
-          <span className="t-bg">за да оставиш оценка и коментар.</span>
+          {t.toComment}
         </p>
       )}
 
-      {notice && <p className="mt-3 text-sm text-emerald-700">{notice}</p>}
-      {error && <p className="mt-3 text-sm text-rose-700">{error}</p>}
+      {notice && <p className="note-ok mt-3 text-sm">{notice}</p>}
+      {error && <p className="note-error mt-3">{error}</p>}
 
       {data && data.items.length === 0 && (
-        <p className="mt-4 rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-          <span className="t-en">No comments yet. Be the first.</span>
-          <span className="t-bg">Още няма коментари. Бъди първи.</span>
+        <p className="empty mt-4">
+          {t.none}
         </p>
       )}
 
       {data && data.items.length > 0 && (
         <ul className="mt-4 space-y-4">
           {data.items.map((comment) => (
-            <li key={comment.id} className="rounded-lg bg-slate-50 p-4">
+            <li key={comment.id} className="rounded-sm border border-gold/15 bg-black/25 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="break-words text-sm font-semibold text-slate-800">{comment.author}</p>
+                <p className="break-words font-display text-sm font-semibold text-ivory">{comment.author}</p>
                 <div className="flex items-center gap-3">
                   <Stars rating={comment.rating} />
                   {comment.canDelete && (
                     <button
                       type="button"
                       onClick={() => remove(comment.id)}
-                      className="text-xs font-medium text-rose-600 hover:underline"
+                      className="link text-xs font-medium text-ember-text hover:text-ember-2"
                     >
-                      <span className="t-en">Delete</span>
-                      <span className="t-bg">Изтрий</span>
+                      {t.delete}
                     </button>
                   )}
                 </div>
               </div>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-dust">
                 {new Date(comment.createdAt).toLocaleString()}
               </p>
-              <p className="mt-2 whitespace-pre-line break-words text-sm text-slate-700">{comment.text}</p>
+              <p className="mt-2 whitespace-pre-line break-words text-sm text-parchment/90">{comment.text}</p>
             </li>
           ))}
         </ul>
