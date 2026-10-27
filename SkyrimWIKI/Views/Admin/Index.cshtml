@@ -1,0 +1,43 @@
+@model IEnumerable<SkyrimWIKI.Controllers.AdminUserViewModel>
+@{
+    ViewData["Title"] = "Admin panel";
+}
+<h1 class="page-title text-2xl">Admin panel</h1>
+<p class="mt-2 text-sm text-dust">Manage users and roles.</p>
+<hr class="divider-gold mt-3 w-full" />
+<div class="frame mt-6 overflow-x-auto">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b border-slate text-left">
+                <th class="px-4 py-3 text-dust">Email</th>
+                <th class="px-4 py-3 text-dust">Roles</th>
+                <th class="px-4 py-3 text-right text-dust">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var u in Model)
+        {
+            <tr class="border-b border-slate/60">
+                <td class="px-4 py-3">@u.Email</td>
+                <td class="px-4 py-3">@string.Join(", ", u.Roles)</td>
+                <td class="px-4 py-3 text-right">
+                    @if (!u.Roles.Contains("Admin"))
+                    {
+                        <form asp-action="Promote" method="post" class="inline">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <button class="btn btn-ghost btn-sm">Make admin</button>
+                        </form>
+                    }
+                    else if (u.Id != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                    {
+                        <form asp-action="Demote" method="post" class="inline">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <button class="btn btn-danger btn-sm">Remove admin</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
