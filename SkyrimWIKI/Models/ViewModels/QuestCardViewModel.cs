@@ -10,6 +10,7 @@ public class QuestCardViewModel
     public int Level { get; set; }
     public string LocationName { get; set; } = string.Empty;
     public string Excerpt { get; set; } = string.Empty;
+    public string? ImagePath { get; set; }
 
     // Used when the location was already loaded (Include) with the quest.
     public static QuestCardViewModel From(Quest quest)
@@ -27,7 +28,8 @@ public class QuestCardViewModel
             Title = quest.Title,
             Level = quest.Level,
             LocationName = locationName,
-            Excerpt = excerpt
+            Excerpt = excerpt,
+            ImagePath = quest.ImagePath
         };
     }
 }

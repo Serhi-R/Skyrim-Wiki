@@ -8,6 +8,7 @@ namespace SkyrimWIKI.Controllers;
 
 // Home renders the landing page and the project description. It only reads
 // through the repository, like every other controller.
+[Route("")]
 public class HomeController : Controller
 {
     private readonly IRepository<Quest> _quests;
@@ -27,6 +28,7 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    [HttpGet("")]
     public IActionResult Index()
     {
         // The repository has no Include, so location names are joined in
@@ -49,16 +51,20 @@ public class HomeController : Controller
         return View(model);
     }
 
+    [HttpGet("about")]
     public IActionResult About() => View();
 
     // Re executed for 404 and other error statuses. The status code is set
-    // again because re executing resets it to 200.
-    public IActionResult StatusCode(int code)
+    // again because re executing resets it to 200. Named StatusPage so it does
+    // not hide ControllerBase.StatusCode.
+    [HttpGet("status")]
+    public IActionResult StatusPage(int code)
     {
         Response.StatusCode = code;
         return View(code);
     }
 
+    [HttpGet("error")]
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

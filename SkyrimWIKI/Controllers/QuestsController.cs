@@ -12,6 +12,7 @@ namespace SkyrimWIKI.Controllers;
 // Quest entries: list, details and the write actions. Reads go through the
 // repositories; the date and author fields are always set here, never bound
 // from the form.
+[Route("quests")]
 public class QuestsController : Controller
 {
     private readonly IQuestRepository _quests;
@@ -32,9 +33,11 @@ public class QuestsController : Controller
 
     // The list itself is rendered by the React catalog from /api/quests; this
     // action only serves the page shell.
+    [HttpGet("")]
     public IActionResult Index() => View();
 
     // Downloads the quests that match the current filter as a CSV file.
+    [HttpGet("export")]
     public IActionResult Export(QuestFilter filter)
     {
         // The whole result is wanted, not one page of it.
@@ -75,6 +78,7 @@ public class QuestsController : Controller
     private static string Escape(string value)
         => $"\"{value.Replace("\"", "\"\"")}\"";
 
+    [HttpGet("{id:int}")]
     public IActionResult Details(int id)
     {
         var quest = _quests.GetById(id);
@@ -83,7 +87,8 @@ public class QuestsController : Controller
             return NotFound();
         }
 
-        var location = _locations.GetById(quest.LocationId);        var model = new QuestDetailsViewModel
+        var location = _locations.GetById(quest.LocationId);
+        var model = new QuestDetailsViewModel
         {
             Quest = quest,
             LocationName = location?.Name ?? "",
@@ -93,24 +98,30 @@ public class QuestsController : Controller
         return View(model);
     }
 
+    [HttpGet("create")]
     [Authorize]
     public IActionResult Create()
     {
-        LoadLocations();
-        return View(new Quest());
+        var vm = new QuestFormViewModel
+        {
+            Quest = new Quest(),
+            Locations = new SelectList(_locations.GetAll(), "Id", "Name")
+        };
+        return View(vm);
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Quest quest)
+    public async Task<IActionResult> Create(QuestFormViewModel vm)
     {
+        var quest = vm.Quest;
         ValidateImage(quest);
 
         if (!ModelState.IsValid)
         {
-            LoadLocations(quest.LocationId);
-            return View(quest);
+            vm.Locations = new SelectList(_locations.GetAll(), "Id", "Name", quest.LocationId);
+            return View(vm);
         }
 
         if (quest.Image is { Length: > 0 })
@@ -128,6 +139,7 @@ public class QuestsController : Controller
         return RedirectToAction(nameof(Details), new { id = quest.Id });
     }
 
+    [HttpGet("{id:int}/edit")]
     [Authorize]
     public IActionResult Edit(int id)
     {
@@ -137,15 +149,20 @@ public class QuestsController : Controller
             return NotFound();
         }
 
-        LoadLocations(quest.LocationId);
-        return View(quest);
+        var vm = new QuestFormViewModel
+        {
+            Quest = quest,
+            Locations = new SelectList(_locations.GetAll(), "Id", "Name", quest.LocationId)
+        };
+        return View(vm);
     }
 
-    [HttpPost]
+    [HttpPost("{id:int}/edit")]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, Quest quest)
+    public async Task<IActionResult> Edit(int id, QuestFormViewModel vm)
     {
+        var quest = vm.Quest;
         if (id != quest.Id)
         {
             return BadRequest();
@@ -161,8 +178,8 @@ public class QuestsController : Controller
 
         if (!ModelState.IsValid)
         {
-            LoadLocations(quest.LocationId);
-            return View(quest);
+            vm.Locations = new SelectList(_locations.GetAll(), "Id", "Name", quest.LocationId);
+            return View(vm);
         }
 
         // Only editable fields are copied; the creation date is kept as it was.
@@ -190,15 +207,16 @@ public class QuestsController : Controller
         return RedirectToAction(nameof(Details), new { id });
     }
 
-    [Authorize]
+    [HttpGet("{id:int}/delete")]
+    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int id)
     {
         var quest = _quests.GetById(id);
         return quest is null ? NotFound() : View(quest);
     }
 
-    [HttpPost]
-    [Authorize]
+    [HttpPost("{id:int}/delete")]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     [ActionName("Delete")]
     public IActionResult DeleteConfirmed(int id)
@@ -233,10 +251,4 @@ public class QuestsController : Controller
         }
     }
 
-    // Fills the location dropdown. The selected id is passed in on POST so the
-    // choice survives a failed validation.
-    private void LoadLocations(int? selectedId = null)
-    {
-        ViewData["Locations"] = new SelectList(_locations.GetAll(), "Id", "Name", selectedId);
-    }
 }

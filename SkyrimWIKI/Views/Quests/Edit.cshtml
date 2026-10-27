@@ -1,40 +1,34 @@
-@model Quest
+@model SkyrimWIKI.Models.ViewModels.QuestFormViewModel
 @{
-    ViewData["Title"] = "Edit quest";
+    ViewData["Title"] = L["quests.editTitle"];
 }
 
 <div class="mx-auto max-w-xl">
-    <h1 class="text-2xl font-bold text-slate-900">
-        <span class="t-en">Edit quest</span><span class="t-bg">Редакция на задание</span>
-    </h1>
+    <h1 class="page-title text-2xl">
+        @L["quests.editTitle"]</h1>
+    <hr class="divider-gold mt-3 w-full" />
 
-    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data"
-          class="mt-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div asp-validation-summary="ModelOnly" class="mb-4 rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700"></div>
-        <input type="hidden" asp-for="Id" />
+    <form asp-action="Edit" asp-route-id="@Model.Quest.Id" method="post" enctype="multipart/form-data" class="frame mt-5 p-6">
+        <div asp-validation-summary="ModelOnly" class="note-error mb-4"></div>
+        <input type="hidden" asp-for="Quest.Id" />
 
-        @if (Model.ImagePath is not null)
+        @if (Model.Quest.ImagePath is not null)
         {
             <div class="mb-4">
-                <p class="mb-1 text-sm font-medium text-slate-700">
-                    <span class="t-en">Current image</span><span class="t-bg">Текущо изображение</span>
-                </p>
-                <img src="@Model.ImagePath" alt="@Model.Title"
-                     class="h-32 w-auto rounded-md border border-slate-200 object-cover" />
+                <p class="label">
+                    @L["quests.currentImage"]</p>
+                <img src="@Model.Quest.ImagePath" alt="@Model.Quest.Title"
+                     class="h-32 w-auto rounded-sm border border-gold/25 object-cover" />
             </div>
         }
 
-        <partial name="_QuestForm" model="Model" />
+        <partial name="_QuestForm" model="Model.Quest" view-data='@(new ViewDataDictionary(ViewData) { ["Locations"] = Model.Locations })' />
 
         <div class="mt-6 flex gap-3">
-            <button type="submit"
-                    class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
-                <span class="t-en">Save changes</span><span class="t-bg">Запази промените</span>
-            </button>
-            <a asp-action="Details" asp-route-id="@Model.Id"
-               class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
-                <span class="t-en">Cancel</span><span class="t-bg">Отказ</span>
-            </a>
+            <button type="submit" class="btn btn-solid">
+                @L["quests.saveChanges"]</button>
+            <a asp-action="Details" asp-route-id="@Model.Quest.Id" class="btn btn-ghost">
+                @L["quests.cancel"]</a>
         </div>
     </form>
 </div>

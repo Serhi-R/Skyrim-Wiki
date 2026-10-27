@@ -4,59 +4,56 @@
 }
 
 <article class="mx-auto max-w-3xl">
-    <a asp-action="Index" class="text-sm font-medium text-emerald-700 hover:underline">
-        &larr; <span class="t-en">All quests</span><span class="t-bg">Всички задания</span>
-    </a>
+    <a asp-action="Index" class="link font-display text-xs font-semibold uppercase tracking-[0.14em]">
+        &larr; @L["quests.backToList"]</a>
 
-    <div class="mt-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="frame mt-3 p-6">
         <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
-                <h1 class="break-words text-2xl font-bold text-slate-900">@Model.Quest.Title</h1>
-                <p class="mt-1 text-sm text-slate-500">
+                <h1 class="page-title break-words text-2xl">@Model.Quest.Title</h1>
+                <p class="mt-2 text-sm text-dust">
                     <a asp-controller="Locations" asp-action="Details" asp-route-id="@Model.Quest.LocationId"
-                       class="hover:text-emerald-700 hover:underline">@Model.LocationName</a>
-                    &middot; @Model.LocationRegion
+                       class="link">@Model.LocationName</a>
+                    <span class="text-dust/70">|</span> @Model.LocationRegion
                 </p>
             </div>
-            <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700">
-                Lv. @Model.Quest.Level
-            </span>
+            <span class="badge">Lv. @Model.Quest.Level</span>
         </div>
 
-        <p class="mt-5 whitespace-pre-line leading-relaxed text-slate-700">@Model.Quest.Description</p>
+        <p class="mt-5 whitespace-pre-line leading-relaxed text-parchment/90">@L.Content("quests", Model.Quest.Title, Model.Quest.Description)</p>
 
-        @if (Model.Quest.ImagePath is not null)
+        @{
+            var questImage = Images.Quest(Model.Quest.Title, Model.Quest.ImagePath, large: true);
+        }
+        @if (questImage is not null)
         {
-            <img src="@Model.Quest.ImagePath" alt="@Model.Quest.Title"
-                 class="mt-5 h-auto w-full rounded-lg border border-slate-200 object-cover" />
+            <img src="@questImage" alt="@Model.Quest.Title" width="1600" height="900"
+                 class="mt-5 h-auto w-full rounded-sm border border-slate object-cover" />
         }
 
-        <dl class="mt-6 grid grid-cols-1 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-2">
+        <dl class="mt-6 grid grid-cols-1 gap-4 border-t border-gold/15 pt-5 sm:grid-cols-2">
             <div>
-                <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    <span class="t-en">Reward</span><span class="t-bg">Награда</span>
-                </dt>
-                <dd class="mt-1 text-sm text-slate-700">@Model.Quest.Reward</dd>
+                <dt class="meta">
+                    @L["quests.reward"]</dt>
+                <dd class="mt-1 text-parchment">@Model.Quest.Reward</dd>
             </div>
             <div>
-                <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                    <span class="t-en">Added</span><span class="t-bg">Добавено</span>
-                </dt>
-                <dd class="mt-1 text-sm text-slate-700">@Model.Quest.CreatedAt.ToString("dd MMM yyyy")</dd>
+                <dt class="meta">
+                    @L["quests.added"]</dt>
+                <dd class="mt-1 text-parchment">@Model.Quest.CreatedAt.ToString("dd MMM yyyy")</dd>
             </div>
         </dl>
 
         @if (User.Identity?.IsAuthenticated == true)
         {
-            <div class="mt-6 flex flex-wrap gap-3 border-t border-slate-100 pt-5">
-                <a asp-action="Edit" asp-route-id="@Model.Quest.Id"
-                   class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
-                    <span class="t-en">Edit</span><span class="t-bg">Редакция</span>
-                </a>
-                <a asp-action="Delete" asp-route-id="@Model.Quest.Id"
-                   class="rounded-md bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700 hover:bg-rose-100">
-                    <span class="t-en">Delete</span><span class="t-bg">Изтриване</span>
-                </a>
+            <div class="mt-6 flex flex-wrap gap-3 border-t border-gold/15 pt-5">
+                <a asp-action="Edit" asp-route-id="@Model.Quest.Id" class="btn btn-ghost">
+                    @L["quests.edit"]</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.Quest.Id" class="btn btn-danger">
+                        @L["quests.delete"]</a>
+                }
             </div>
         }
     </div>
@@ -64,6 +61,7 @@
     @Html.AntiForgeryToken()
     <div id="quest-comments"
          data-quest-id="@Model.Quest.Id"
+         data-lang="@L.Lang"
          data-auth="@(User.Identity?.IsAuthenticated == true ? "true" : "false")">
     </div>
 </article>

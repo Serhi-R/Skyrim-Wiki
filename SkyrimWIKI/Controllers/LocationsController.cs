@@ -6,6 +6,7 @@ using SkyrimWIKI.Repositories;
 namespace SkyrimWIKI.Controllers;
 
 // Read only pages for the locations, including the quests found in each one.
+[Route("locations")]
 public class LocationsController : Controller
 {
     private readonly IRepository<Location> _locations;
@@ -17,6 +18,7 @@ public class LocationsController : Controller
         _quests = quests;
     }
 
+    [HttpGet("")]
     public IActionResult Index()
     {
         // One query for all quests, then quests are counted per location in
@@ -37,6 +39,7 @@ public class LocationsController : Controller
         return View(model);
     }
 
+    [HttpGet("{id:int}")]
     public IActionResult Details(int id)
     {
         var location = _locations.GetById(id);

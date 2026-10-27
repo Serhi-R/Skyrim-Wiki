@@ -1,82 +1,75 @@
-﻿<!DOCTYPE html>
-<html lang="en" data-lang="en">
+﻿@{
+    string NavLink(string controller, string? action = null)
+    {
+        var current = ViewContext.RouteData.Values;
+        var sameController = string.Equals(current["controller"]?.ToString(), controller, StringComparison.OrdinalIgnoreCase);
+        var sameAction = action is null || string.Equals(current["action"]?.ToString(), action, StringComparison.OrdinalIgnoreCase);
+        return sameController && sameAction ? "text-gold" : "text-frost hover:text-candle";
+    }
+
+    var returnUrl = Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString);
+}
+<!DOCTYPE html>
+<html lang="@L.Lang">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SkyrimWIKI</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="icon" href="~/img/logo.svg" type="image/svg+xml" />
 </head>
-@{
-    string NavLink(string controller) =>
-        string.Equals(ViewContext.RouteData.Values["controller"]?.ToString(), controller, StringComparison.OrdinalIgnoreCase)
-            ? "text-emerald-700 font-semibold"
-            : "text-slate-600 hover:text-emerald-700 font-medium";
-}
-<body class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-800">
-    <header class="sticky top-0 z-10 border-b border-slate-200 bg-white/95 backdrop-blur">
+<body class="flex min-h-screen flex-col">
+    <a href="#main" class="skip-link">@(L.IsBg ? "Към съдържанието" : "Skip to content")</a>
+    <header class="sticky top-0 z-10 border-b border-slate bg-abyss/85 backdrop-blur">
         <nav class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-            <a asp-controller="Home" asp-action="Index"
-               class="text-lg font-bold tracking-tight text-slate-900 hover:text-emerald-700">SkyrimWIKI</a>
+            <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2 text-gold hover:text-candle">
+                <img src="~/img/logo.svg" alt="" width="28" height="28" class="h-7 w-7" />
+                <span class="font-display text-lg font-bold tracking-[0.12em]">SkyrimWIKI</span>
+            </a>
 
             <button id="nav-toggle" type="button"
-                    class="ml-auto rounded-md border border-slate-300 p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
-                    aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-menu">
+                    class="ml-auto rounded-sm border border-slate p-2 text-frost hover:border-gold/60 hover:text-candle lg:hidden"
+                    aria-label="@(L.IsBg ? "Меню" : "Toggle navigation")" aria-expanded="false" aria-controls="nav-menu">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
 
             <div id="nav-menu"
-                 class="hidden w-full flex-col gap-2 border-t border-slate-100 pt-2 lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:gap-6 lg:border-t-0 lg:pt-0">
-                <ul class="flex flex-col gap-1 text-sm lg:flex-row lg:items-center lg:gap-5">
-                    <li>
-                        <a asp-controller="Home" asp-action="Index" class="@NavLink("Home") block py-1.5 lg:py-0">
-                            <span class="t-en">Home</span><span class="t-bg">Начало</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Quests" asp-action="Index" class="@NavLink("Quests") block py-1.5 lg:py-0">
-                            <span class="t-en">Quests</span><span class="t-bg">Задания</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Races" asp-action="Index" class="@NavLink("Races") block py-1.5 lg:py-0">
-                            <span class="t-en">Races</span><span class="t-bg">Раси</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Locations" asp-action="Index" class="@NavLink("Locations") block py-1.5 lg:py-0">
-                            <span class="t-en">Locations</span><span class="t-bg">Локации</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a asp-controller="Home" asp-action="About" class="@NavLink("Home") block py-1.5 lg:py-0">
-                            <span class="t-en">About</span><span class="t-bg">За проекта</span>
-                        </a>
-                    </li>
+                 class="hidden w-full flex-col gap-2 border-t border-slate pt-2 lg:flex lg:w-auto lg:flex-1 lg:flex-row lg:items-center lg:gap-6 lg:border-t-0 lg:pt-0">
+                <ul class="flex flex-col gap-1 text-sm font-semibold lg:flex-row lg:items-center lg:gap-6">
+                    <li><a asp-controller="Home" asp-action="Index" class="@NavLink("Home", "Index") block py-1.5 lg:py-0">@L["nav.home"]</a></li>
+                    <li><a asp-controller="Quests" asp-action="Index" class="@NavLink("Quests") block py-1.5 lg:py-0">@L["nav.quests"]</a></li>
+                    <li><a asp-controller="Races" asp-action="Index" class="@NavLink("Races") block py-1.5 lg:py-0">@L["nav.races"]</a></li>
+                    <li><a asp-controller="Locations" asp-action="Index" class="@NavLink("Locations") block py-1.5 lg:py-0">@L["nav.locations"]</a></li>
+                    <li><a asp-controller="Home" asp-action="About" class="@NavLink("Home", "About") block py-1.5 lg:py-0">@L["nav.about"]</a></li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li><a asp-controller="Admin" asp-action="Index" class="text-gold block py-1.5 lg:py-0">Admin</a></li>
+                    }
                 </ul>
 
                 <div class="flex items-center gap-3 lg:ml-auto">
-                    <button id="lang-toggle" type="button"
-                            class="rounded-md border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                            aria-label="Switch language">
-                        <span class="t-en">БГ</span><span class="t-bg">EN</span>
-                    </button>
+                    <div class="flex items-center gap-1 text-xs font-semibold text-ice" title="@L["lang.label"]">
+                        <a href="/language/en?returnUrl=@returnUrl"
+                           class="rounded-sm px-1.5 py-0.5 @(L.IsBg ? "hover:text-candle" : "text-gold")">EN</a>
+                        <span class="text-slate">/</span>
+                        <a href="/language/bg?returnUrl=@returnUrl"
+                           class="rounded-sm px-1.5 py-0.5 @(L.IsBg ? "text-gold" : "hover:text-candle")">BG</a>
+                    </div>
                     <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
 
-    <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
+    <main id="main" class="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">
         @RenderBody()
     </main>
 
-    <footer class="border-t border-slate-200 bg-white">
-        <div class="mx-auto max-w-6xl px-4 py-4 text-sm text-slate-500 sm:px-6">
-            &copy; 2026 SkyrimWIKI &middot;
-            <span class="t-en">Microsoft Web Technologies course project</span>
-            <span class="t-bg">Курсов проект по Microsoft Web технологии</span>
+    <footer class="border-t border-slate bg-abyss/60">
+        <div class="mx-auto max-w-6xl px-4 py-5 text-sm text-ice sm:px-6">
+            &copy; 2026 SkyrimWIKI. @L["footer.rights"]
         </div>
     </footer>
 

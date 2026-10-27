@@ -1,70 +1,46 @@
 @{
-    ViewData["Title"] = "About";
+    ViewData["Title"] = L["nav.about"];
 }
 
-<h1 class="text-2xl font-bold text-slate-900">
-    <span class="t-en">About the project</span><span class="t-bg">За проекта</span>
-</h1>
+<h1 class="page-title text-2xl">@L["about.title"]</h1>
+<hr class="divider-gold mt-3 w-full" />
 
 <section class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="font-semibold text-slate-900">
-            <span class="t-en">Team</span><span class="t-bg">Екип</span>
-        </h2>
-        <p class="mt-2 text-sm text-slate-600">Serhi-R</p>
-        <p class="mt-1 text-sm text-slate-500">
-            <span class="t-en">Individual project, one author.</span>
-            <span class="t-bg">Индивидуален проект, един автор.</span>
-        </p>
+    <div class="frame p-5">
+        <h2 class="section-title text-base">@L["about.team"]</h2>
+        <p class="mt-3 text-frost">Serhi-R</p>
+        <p class="mt-1 text-sm text-ice">@L["about.teamNote"]</p>
     </div>
 
-    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="font-semibold text-slate-900">
-            <span class="t-en">Main features</span><span class="t-bg">Основни функции</span>
-        </h2>
-        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-            <li><span class="t-en">Wiki pages for quests, races and locations</span><span class="t-bg">Страници за задания, раси и локации</span></li>
-            <li><span class="t-en">Full CRUD for quest entries, with image upload</span><span class="t-bg">Пълен CRUD за записите със задания, с качване на изображение</span></li>
-            <li><span class="t-en">Search, filters, sorting and paging in a React catalog</span><span class="t-bg">Търсене, филтри, сортиране и странициране в React каталог</span></li>
-            <li><span class="t-en">Comments and star ratings stored through a JSON API</span><span class="t-bg">Коментари и оценки чрез JSON API</span></li>
-            <li><span class="t-en">CSV export of the filtered quest list</span><span class="t-bg">CSV експорт на филтрираните задания</span></li>
-            <li><span class="t-en">Registration, login and protected actions</span><span class="t-bg">Регистрация, вход и защитени действия</span></li>
-            <li><span class="t-en">Bilingual interface, English and Bulgarian</span><span class="t-bg">Двуезичен интерфейс, английски и български</span></li>
-            <li><span class="t-en">Responsive layout for phone, tablet and desktop</span><span class="t-bg">Адаптивен изглед за телефон, таблет и компютър</span></li>
+    <div class="frame p-5">
+        <h2 class="section-title text-base">@L["about.features"]</h2>
+        <ul class="mt-3 list-disc space-y-1.5 pl-5 text-sm text-frost/90">
+            <li>@L["about.features.1"]</li>
+            <li>@L["about.features.2"]</li>
+            <li>@L["about.features.3"]</li>
+            <li>@L["about.features.4"]</li>
+            <li>@L["about.features.5"]</li>
+            <li>@L["about.features.6"]</li>
+            <li>@L["about.features.7"]</li>
         </ul>
     </div>
 
-    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="font-semibold text-slate-900">
-            <span class="t-en">Technologies</span><span class="t-bg">Технологии</span>
-        </h2>
-        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-            <li>ASP.NET Core MVC, .NET 10</li>
-            <li>Entity Framework Core, SQLite</li>
-            <li>ASP.NET Core Identity</li>
-            <li>Razor views, Tailwind CSS</li>
-            <li>React 19 with TypeScript</li>
-            <li>Serilog</li>
+    <div class="frame p-5">
+        <h2 class="section-title text-base">@L["about.tech"]</h2>
+        <ul class="mt-3 list-disc space-y-1.5 pl-5 text-sm text-frost/90">
+            <li>@L["about.tech.1"]</li>
+            <li>@L["about.tech.2"]</li>
+            <li>@L["about.tech.3"]</li>
+            <li>@L["about.tech.4"]</li>
+            <li>@L["about.tech.5"]</li>
+            <li>@L["about.tech.6"]</li>
         </ul>
     </div>
 </section>
 
-<section class="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-    <h2 class="font-semibold text-slate-900">
-        <span class="t-en">Architecture</span><span class="t-bg">Архитектура</span>
-    </h2>
-    <p class="mt-2 text-sm leading-relaxed text-slate-600">
-        <span class="t-en">
-            The application follows MVC: models hold the data and its validation
-            rules, controllers decide what to show, and Razor views render the
-            HTML. Controllers reach the database only through the repository
-            pattern, never directly.
-        </span>
-        <span class="t-bg">
-            Приложението следва MVC: моделите пазят данните и правилата за
-            валидация, контролерите решават какво да се покаже, а Razor
-            изгледите рендерират HTML. Контролерите достигат до базата данни
-            само чрез шаблона repository, никога директно.
-        </span>
+<section class="frame mt-6 p-6">
+    <h2 class="section-title text-base">@L["about.arch"]</h2>
+    <p class="mt-3 leading-relaxed text-frost/90">
+        @L["about.archText"]
     </p>
 </section>

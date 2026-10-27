@@ -1,31 +1,37 @@
+@using SkyrimWIKI.Services
 @model IEnumerable<SkyrimWIKI.Models.ViewModels.LocationCardViewModel>
 @{
-    ViewData["Title"] = "Locations";
+    ViewData["Title"] = L["locations.title"];
 }
 
-<h1 class="text-2xl font-bold text-slate-900">
-    <span class="t-en">Locations</span><span class="t-bg">Локации</span>
-</h1>
-<p class="mt-1 text-sm text-slate-500">
-    <span class="t-en">Places of Skyrim and the quests that happen there.</span>
-    <span class="t-bg">Местата в Скайрим и заданията, които се случват там.</span>
-</p>
+<h1 class="page-title text-2xl">@L["locations.title"]</h1>
+<p class="mt-2 text-sm text-ice">@L["locations.subtitle"]</p>
+<hr class="divider-gold mt-3 w-full" />
 
 <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
     @foreach (var card in Model)
     {
+        var image = Images.Hold(card.Location.Name);
+        var text = L.Content("locations", card.Location.Name, card.Location.Description);
         <a asp-action="Details" asp-route-id="@card.Location.Id"
-           class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md">
-            <div class="flex items-center justify-between gap-2">
-                <h2 class="break-words font-semibold text-slate-900">@card.Location.Name</h2>
-                <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                    @card.QuestCount <span class="t-en">quests</span><span class="t-bg">задания</span>
-                </span>
+           class="frame frame-hover group block overflow-hidden">
+            <div class="relative h-40 border-b border-slate bg-gradient-to-br from-slate/50 to-panel">
+                @if (image is not null)
+                {
+                    <img src="@image" alt="@card.Location.Name" width="800" height="533"
+                         loading="lazy" class="cover opacity-80 transition group-hover:opacity-100" />
+                }
             </div>
-            <p class="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">@card.Location.Region</p>
-            <p class="mt-2 text-sm leading-relaxed text-slate-600">
-                @(card.Location.Description.Length > 120 ? card.Location.Description[..120] + "..." : card.Location.Description)
-            </p>
+            <div class="p-5">
+                <div class="flex items-start justify-between gap-2">
+                    <h2 class="break-words font-display font-semibold text-ivory">@card.Location.Name</h2>
+                    <span class="badge shrink-0">@string.Format(L["locations.questCount"], card.QuestCount)</span>
+                </div>
+                <p class="meta mt-1">@card.Location.Region</p>
+                <p class="mt-2 text-sm leading-relaxed text-frost/80">
+                    @(text.Length > 120 ? text[..120] + "..." : text)
+                </p>
+            </div>
         </a>
     }
 </div>

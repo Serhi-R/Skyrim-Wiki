@@ -1,30 +1,24 @@
 @model Quest
 @{
-    ViewData["Title"] = "Delete quest";
+    ViewData["Title"] = L["quests.deleteTitle"];
 }
 
-<div class="mx-auto max-w-xl rounded-xl border border-rose-200 bg-white p-6 shadow-sm">
-    <h1 class="text-2xl font-bold text-slate-900">
-        <span class="t-en">Delete this quest?</span><span class="t-bg">Да се изтрие ли заданието?</span>
-    </h1>
-    <p class="mt-2 text-sm text-slate-600">
-        <span class="t-en">This action cannot be undone.</span>
-        <span class="t-bg">Това действие не може да бъде отменено.</span>
+<div class="frame mx-auto max-w-xl p-6">
+    <h1 class="page-title text-2xl">
+        @L["quests.deleteTitle"]</h1>
+    <p class="mt-2 text-sm text-parchment/85">
+        @L["quests.deleteConfirm"]
     </p>
 
-    <div class="mt-4 rounded-lg bg-slate-50 p-4">
-        <p class="font-semibold text-slate-900">@Model.Title</p>
-        <p class="mt-1 text-sm text-slate-500">Lv. @Model.Level</p>
+    <div class="mt-4 rounded-sm border border-gold/15 bg-black/25 p-4">
+        <p class="font-display font-semibold text-ivory">@Model.Title</p>
+        <p class="mt-1 text-sm text-dust">Lv. @Model.Level</p>
     </div>
 
     <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="mt-6 flex gap-3">
-        <button type="submit"
-                class="rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">
-            <span class="t-en">Delete</span><span class="t-bg">Изтрий</span>
-        </button>
-        <a asp-action="Details" asp-route-id="@Model.Id"
-           class="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
-            <span class="t-en">Cancel</span><span class="t-bg">Отказ</span>
-        </a>
+        <button type="submit" class="btn btn-danger">
+            @L["quests.delete"]</button>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-ghost">
+            @L["quests.cancel"]</a>
     </form>
 </div>
